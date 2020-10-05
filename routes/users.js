@@ -32,7 +32,7 @@ router.post('/user/process', async function(req, res, next) {
   res.send(result)
 })
 
-router.get('/users/all', async (req, res, next) => {
+router.get('/user/all', async (req, res, next) => {
   const result = await user.getAllUsers()
   //res.setHeader("content-type", "application/json")
   res.send(result)
