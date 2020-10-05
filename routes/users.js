@@ -19,6 +19,7 @@ router.post('/user/login', async function(req, res, next) {
     statusOperationCode = 1
   }
   if(statusOperationCode === 1){
+    console.log("statusOperationCode: ", statusOperationCode)
     res.send(status.statusOperation(statusOperationCode, `Error en los datos: `, error, {user: []}))
   } else {
     const result = await user.loginUser(req.body.username, req.body.password)

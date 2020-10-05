@@ -16,7 +16,7 @@ async function getAllUsers(){
 async function loginUser(username, password){
     try{
         const results = await client.query(`SELECT * FROM public."users" WHERE username = $1 and password = $2`, [username, password])
-
+        console.log("loginUser: ", results)
         if(results.rows.length > 0){
             delete results.rows[0].password
             return status.statusOperation(0, `Procesado Correctamente`, [], {users: results.rows})
