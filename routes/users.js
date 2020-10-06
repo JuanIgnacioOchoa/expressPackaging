@@ -5,9 +5,8 @@ const status = require('../database/status')
 /* GET home page. */
 router.post('/user/login', async function(req, res, next) {
   const { username, password } = req.body
-  console.log("Username: ", username)
-  console.log("Password: ", password)
   const error = []
+  var response;
   var statusOperationCode = 0
   if(username === undefined){
     error.push(" *** Missing username *** ")
@@ -19,18 +18,18 @@ router.post('/user/login', async function(req, res, next) {
     statusOperationCode = 1
   }
   if(statusOperationCode === 1){
-    console.log("statusOperationCode: ", statusOperationCode)
-    res.send(status.statusOperation(statusOperationCode, `Error en los datos: `, error, {user: []}))
+    response = status.statusOperation(statusOperationCode, `Error en los datos: `, error, {user: []})
   } else {
-    const result = await user.loginUser(req.body.username, req.body.password)
-    res.send(result)
+    response = await user.loginUser(req.body.username, req.body.password)
   }
+  console.log("Response: ", response)
+  res.send(response)
 });
 
 router.post('/user/process', async function(req, res, next) {
-  const result = await user.processUser(req.body)
-  console.log(result)
-  res.send(result)
+  var response = await user.processUser(req.body)
+  console.log("Response: ", response)
+  res.send(response)
 })
 
 router.get('/user/all', async (req, res, next) => {

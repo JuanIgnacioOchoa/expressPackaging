@@ -4,6 +4,8 @@ const client = new Client({
     "user": "postgres",
     "password": "Jiog040719",
     "host": "top-express-dev.cxsn0wvppdrz.us-east-2.rds.amazonaws.com",
+    //"password": "9462",
+    //"host": "juans-macbook-pro.local",
     "port": 5432,
     "database": "topExpress"
 })

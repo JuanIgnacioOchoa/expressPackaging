@@ -15,6 +15,8 @@ CREATE TABLE public.address
     additional_info character varying COLLATE pg_catalog."default",
     id_user integer,
     id_station integer,
+    created_timestamp date NOT NULL,
+    updated_timestamp date NOT NULL,
     CONSTRAINT address_pkey PRIMARY KEY (id),
     CONSTRAINT fk_station_address FOREIGN KEY (id_station)
         REFERENCES public.station (id) MATCH SIMPLE
