@@ -10,6 +10,8 @@ CREATE TABLE public.history
     date date NOT NULL,
     id_status integer NOT NULL,
     id_package integer NOT NULL,
+    created_timestamp date NOT NULL,
+    updated_timestamp date,
     CONSTRAINT history_pkey PRIMARY KEY (id),
     CONSTRAINT fk_package_history FOREIGN KEY (id_package)
         REFERENCES public."package" (id) MATCH SIMPLE

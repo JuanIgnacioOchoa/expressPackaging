@@ -13,6 +13,11 @@ CREATE TABLE public.users
     mothermaidenname character varying COLLATE pg_catalog."default",
     phone character varying COLLATE pg_catalog."default" NOT NULL,
     id_status integer NOT NULL,
+    confirmation_string character varying COLLATE pg_catalog."default",
+    confirmation_string_date date,
+    confirmation_date date,
+    created_timestamp date NOT NULL,
+    updated_timestamp date NOT NULL,
     CONSTRAINT users_pkey PRIMARY KEY (id),
     CONSTRAINT unique_username UNIQUE (username)
 )
