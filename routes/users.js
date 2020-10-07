@@ -4,6 +4,7 @@ const user = require('../database/users/index');
 const status = require('../database/status')
 /* GET home page. */
 router.post('/user/login', async function(req, res, next) {
+  console.log('/user/login')
   const { username, password } = req.body
   const error = []
   var response;
@@ -33,6 +34,7 @@ router.post('/user/process', async function(req, res, next) {
 })
 
 router.get('/user/all', async (req, res, next) => {
+  console.log("/user/all:")
   const result = await user.getAllUsers()
   //res.setHeader("content-type", "application/json")
   res.send(result)
