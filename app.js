@@ -24,7 +24,6 @@ app.use(function(req, res, next) {
   } else if(req.get('authorization') !== 'Basic dG9wZXhwcmVzczpramFvaXNkdTA5MW4yLG05eHUwOTEyM2w='){
     return res.status(401).json({ error: 'Invalid credentials.'})
   }
-
   next();
 });
 
@@ -55,11 +54,9 @@ app.use(function(err, req, res, next) {
 });
 
 var port = normalizePort(process.env.PORT || '8762');
-console.log("Port: ", port)
 app.listen(port, () => {
   console.log("Wazzaaaaaaaa")
 })
-console.log("Port2: ", process.env.PORT)
 module.exports = app;
 
 function normalizePort(val) {
