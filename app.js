@@ -54,5 +54,26 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+var port = normalizePort(process.env.PORT || '8762');
+console.log("Port: ", port)
+app.listen(port, () => {
+  console.log("Wazzaaaaaaaa")
+})
 console.log("Port2: ", process.env.PORT)
 module.exports = app;
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
