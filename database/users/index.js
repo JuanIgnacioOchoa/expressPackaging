@@ -9,7 +9,7 @@ async function getAllUsers(){
         console.log('Query succeed')
         return status.statusOperation(0, `Procesado Correctamente`, [], { users: results.rows })
     } catch(e){
-        console.error(`Failed at getAllUsers ${e}`)
+        console.error(`TOPEXPRESSERROR: Failed at getAllUsers ${e}`)
         return status.statusOperation(2, `DatabaseOperation Error: `, [e], {users: []})
     }
 }
@@ -27,7 +27,7 @@ async function loginUser(username, password){
         }
         
     } catch(e){
-        console.error(`Failed at loginUser ${e}`)
+        console.error(`TOPEXPRESSERROR: Failed at loginUser ${e}`)
         return status.statusOperation(2, `DatabaseOperation Error: `, [e], {users: []})
     }
 }
@@ -37,7 +37,7 @@ async function processUser(body){
     try {
         const confirmationString = 'abcdefghijklmnopq'
         if(body.newUser){
-            var mysqlTimestamp = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
+            var mysqlTimestamp = moment(Date.now());
             const {username, password, name, lastname, email, mothermaidenname, phone} = body.users[0]
             const values = [username, password, name, lastname, email, mothermaidenname, phone, 1, confirmationString, 
                 mysqlTimestamp, mysqlTimestamp, mysqlTimestamp]
@@ -62,7 +62,7 @@ async function processUser(body){
             return status.statusOperation(0, `Procesado Correctamente`, [], {users: results.rows})
         }
     } catch(e){
-        console.error(`Failed at processUser ${e}`)
+        console.error(`TOPEXPRESSERROR: Failed at processUser ${e}`)
         return status.statusOperation(2, `DatabaseOperation Error: `, [e], {users: []})
     }
 }
