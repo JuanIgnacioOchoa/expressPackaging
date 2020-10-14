@@ -16,8 +16,8 @@ CREATE TABLE public."package"
     shipping_cost numeric NOT NULL,
     package_cost numeric NOT NULL,
     receipt character varying COLLATE pg_catalog."default",
-    created_timestamp date NOT NULL,
-    updated_timestamp date NOT NULL,
+    created_timestamp timestamp with time zone NOT NULL,
+    updated_timestamp timestamp with time zone NOT NULL,
     CONSTRAINT package_pkey PRIMARY KEY (id),
     CONSTRAINT fk_address_package FOREIGN KEY (id_address)
         REFERENCES public.address (id) MATCH SIMPLE

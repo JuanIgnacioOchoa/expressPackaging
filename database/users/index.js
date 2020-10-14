@@ -17,7 +17,9 @@ async function loginUser(username, password){
         const results = await client.query(`SELECT * FROM public."users" WHERE username = $1 and password = $2`, [username, password])
         if(results.rows.length > 0){
             delete results.rows[0].password
-            return status.statusOperation(0, `Procesado Correctamente`, [], {users: results.rows})
+            const resultAddress = await client.query(`SELECT * FROM public."address" WHERE id_user = $1`, [results.rows[0].id])
+            results.rows[0].address = resultAddress.rows
+            return status.statusOperation(0, `Procesado Correctamente`, [], {users: results.rows })
         } else {
             return status.statusOperation(5, `Usuario y/o contraseña incorrectos`, [], {users: results.rows})
         }

@@ -1,11 +1,14 @@
 const { Client } = require('pg')
-
+//host top-express-dev.cxsn0wvppdrz.us-east-2.rds.amazonaws.com
+//password Jiog040719
+const password = (process.env.password || "9462");
+const host = (process.env.host || "juans-macbook-pro.local");
+console.log("Pass: ", password)
+console.log("Host: ", host)
 const client = new Client({
     "user": "postgres",
-    "password": "Jiog040719",
-    "host": "top-express-dev.cxsn0wvppdrz.us-east-2.rds.amazonaws.com",
-    //"password": "9462",
-    //"host": "juans-macbook-pro.local",
+    "password": password,
+    "host": host,
     "port": 5432,
     "database": "topExpress"
 })
