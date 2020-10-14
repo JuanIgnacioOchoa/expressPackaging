@@ -3,8 +3,10 @@ const status = require('../status')
 const moment = require('moment')
 
 async function getAllUsers(){
+    console.log('getAllUser')
     try{
         const results = await client.query('SELECT * FROM public."users"')
+        console.log('Query succeed')
         return status.statusOperation(0, `Procesado Correctamente`, [], { users: results.rows })
     } catch(e){
         console.error(`Failed at getAllUsers ${e}`)
