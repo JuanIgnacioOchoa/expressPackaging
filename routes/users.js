@@ -4,23 +4,21 @@ const user = require('../database/users/index');
 const status = require('../database/status')
 /* GET home page. */
 router.post('/user/login', async function(req, res, next) {
-  console.log('/user/login')
+  
   const { username, password } = req.body
+  console.log(`${username} ${password}`)
   const error = []
   var response;
   var statusOperationCode = 0
-  console.log('/user/login1')
   if(username === undefined){
     error.push(" *** Missing username *** ")
     returnError = true
     statusOperationCode = 1
   }
-  console.log('/user/login2')
   if(password === undefined){
     error.push(" *** Missing password *** ")
     statusOperationCode = 1
   }
-  console.log('/user/login3')
   if(statusOperationCode === 1){
     response = status.statusOperation(statusOperationCode, `Error en los datos: `, error, {user: []})
   } else {

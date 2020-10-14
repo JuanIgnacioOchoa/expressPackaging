@@ -14,10 +14,10 @@ CREATE TABLE public.users
     phone character varying COLLATE pg_catalog."default" NOT NULL,
     id_status integer NOT NULL,
     confirmation_string character varying COLLATE pg_catalog."default",
-    confirmation_string_date date,
-    confirmation_date date,
-    created_timestamp date NOT NULL,
-    updated_timestamp date NOT NULL,
+    confirmation_string_date timestamp with time zone,
+    confirmation_date timestamp with time zone,
+    created_timestamp timestamp with time zone NOT NULL,
+    updated_timestamp timestamp with time zone NOT NULL,
     CONSTRAINT users_pkey PRIMARY KEY (id),
     CONSTRAINT unique_username UNIQUE (username)
 )
