@@ -14,12 +14,14 @@ CREATE TABLE public.address
     country character varying COLLATE pg_catalog."default" NOT NULL,
     additional_info character varying COLLATE pg_catalog."default",
     id_user integer,
-    id_station integer,
     created_timestamp timestamp with time zone NOT NULL,
     updated_timestamp timestamp with time zone NOT NULL,
+    contact_number character varying COLLATE pg_catalog."default" NOT NULL,
+    id_status integer NOT NULL,
+    contact_name character varying COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT address_pkey PRIMARY KEY (id),
-    CONSTRAINT fk_station_address FOREIGN KEY (id_station)
-        REFERENCES public.station (id) MATCH SIMPLE
+    CONSTRAINT fk_status_address FOREIGN KEY (id_status)
+        REFERENCES public.status (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
         NOT VALID,
@@ -27,20 +29,19 @@ CREATE TABLE public.address
         REFERENCES public.users (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
-        NOT VALID
 )
 
 TABLESPACE pg_default;
 
 ALTER TABLE public.address
     OWNER to postgres;
--- Index: fki_fk_station_address
+-- Index: fki_fk_status_address
 
--- DROP INDEX public.fki_fk_station_address;
+-- DROP INDEX public.fki_fk_status_address;
 
-CREATE INDEX fki_fk_station_address
+CREATE INDEX fki_fk_status_address
     ON public.address USING btree
-    (id_station ASC NULLS LAST)
+    (id_status ASC NULLS LAST)
     TABLESPACE pg_default;
 -- Index: fki_user_address
 

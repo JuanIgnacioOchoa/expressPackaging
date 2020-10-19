@@ -1,6 +1,8 @@
 const client = require('../server')
 const status = require('../status')
 const moment = require('moment')
+const nodemailer = require('nodemailer');
+const constants = require('../../constants')
 
 async function getAllUsers(){
     console.log('getAllUser')
@@ -9,7 +11,7 @@ async function getAllUsers(){
         console.log('Query succeed')
         return status.statusOperation(0, `Procesado Correctamente`, [], { users: results.rows })
     } catch(e){
-        console.error(`Failed at getAllUsers ${e}`)
+        console.error(`TOPEXPRESSERROR: Failed at getAllUsers ${e}`)
         return status.statusOperation(2, `DatabaseOperation Error: `, [e], {users: []})
     }
 }
@@ -27,31 +29,75 @@ async function loginUser(username, password){
         }
         
     } catch(e){
-        console.error(`Failed at loginUser ${e}`)
+        console.error(`TOPEXPRESSERROR: Failed at loginUser ${e}`)
         return status.statusOperation(2, `DatabaseOperation Error: `, [e], {users: []})
     }
 }
 
+function makeid(length) {
+    var result           = '';
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+       result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+}
+
+function sendMail(email, confirmationString, idUser){
+    var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'dev8ag@gmail.com',
+            pass: 'Jiog040719'    
+        }
+    });
+    const host = (process.env.host || "juans-macbook-pro.local");
+    const port = (process.env.PORT || "8762");
+    var mailOptions = {
+        from: 'dev8ag@gmail.com',
+        to: 'juanignacio8ag@gmail.com',
+        subject: 'Correco de activacion de Top Express',
+        text: 'Bienvenido a top',
+        html: `<h1>
+          TopExpress
+        </h1>
+        <p>
+          Bienvenido a top express para activar su cuenta porfavor dele click al siguiente link <a href="${host}:${port}/activate/user/${idUser}/${confirmationString}">www.topexpress.com.mx/activate/user/${idUser}/${confirmationString}</a>
+          <br/>
+          si no reconoces este servicio porfavor ignora este correo
+        </p>`
+    }
+    transporter.sendMail(mailOptions, function(error, info) {
+      if(error){
+        console.log(error)
+      } else {
+        console.log("Email sent: " + info.response)
+      }
+    })
+  }
+  
+
 async function processUser(body){
     console.log("Body: ", body)
     try {
-        const confirmationString = 'abcdefghijklmnopq'
+        const confirmationString = makeid(50)
         if(body.newUser){
-            var mysqlTimestamp = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
-            const {username, password, name, lastname, email, mothermaidenname, phone} = body.users[0]
-            const values = [username, password, name, lastname, email, mothermaidenname, phone, 1, confirmationString, 
-                mysqlTimestamp, mysqlTimestamp, mysqlTimestamp]
+            var mysqlTimestamp = moment(Date.now());
+            const {username, password, name, lastname, email, mothermaidenname, phone, idStatus} = body.users[0]
+            const values = [username, password, name, lastname, email, mothermaidenname, phone, idStatus, confirmationString, mysqlTimestamp, null, mysqlTimestamp, mysqlTimestamp]
             console.log("Values: ", values)
             await client.query(
                 `INSERT INTO public."users" 
-                ( username, password, name, lastname, email, mothermaidenname, phone, id_status, confirmation_string, confirmation_string_date, created_timestamp, updated_timestamp)
-                values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`, values)
+                (username, password, name, lastname, email, mothermaidenname, phone, id_status, confirmation_string, confirmation_string_date, confirmation_date, created_timestamp, updated_timestamp)
+                values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`, values)
             const results = await client.query(`SELECT * FROM public."users" WHERE username = $1 and password = $2`, [username, password])
             delete results.rows[0].password
+            sendMail(email, confirmationString)
             return status.statusOperation(0, `Procesado Correctamente`, [], {users: results.rows})
         } else {
-            const {username, password, name, lastname, email, mothermaidenname, phone, id} = body.users[0]
-            const values = [username, password, name, lastname, email, mothermaidenname, phone, 1, id]
+            const {username, password, name, lastname, email, mothermaidenname, phone, id, idStatus} = body.users[0]
+            const values = [username, password, name, lastname, email, mothermaidenname, phone, idStatus, id]
             await client.query(
                 `UPDATE public.users
                 SET username=$1, password=$2, name=$3, lastname=$4, email=$5, mothermaidenname=$6, phone=$7, id_status=$8
@@ -62,11 +108,33 @@ async function processUser(body){
             return status.statusOperation(0, `Procesado Correctamente`, [], {users: results.rows})
         }
     } catch(e){
-        console.error(`Failed at processUser ${e}`)
+        console.error(`TOPEXPRESSERROR: Failed at processUser ${e}`)
         return status.statusOperation(2, `DatabaseOperation Error: `, [e], {users: []})
+    }
+}
+
+async function confirmUser(idUser, confirmationString){
+    console.log("confirmUser: ", idUser, confirmationString)
+    try{
+        const usersRows = await client.query("Select * from public.users where confirmation_string = $1 and id = $2", [confirmationString, idUser])
+        //console.log(usersRows)
+        if(usersRows && usersRows.rows && usersRows.rows[0]){
+            const values = [constants.ACTIVO_ID, idUser]
+            const result = await client.query(
+                `UPDATE public.users
+                SET id_status=$1
+                WHERE id=$2`, values
+            )
+            return status.statusOperation(0, `Procesado correctamente`,[], {})
+        } else {
+            return status.statusOperation(2, `Error`, ["Usuario y/o url no coinciden"], {})
+        }
+    } catch(e){
+        return status.statusOperation(4, `Error al leer el usuario`,e, {})
     }
 }
 
 exports.getAllUsers = getAllUsers
 exports.loginUser = loginUser
 exports.processUser = processUser
+exports.confirmUser = confirmUser
