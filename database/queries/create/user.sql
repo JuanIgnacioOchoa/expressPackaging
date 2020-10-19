@@ -19,10 +19,23 @@ CREATE TABLE public.users
     created_timestamp timestamp with time zone NOT NULL,
     updated_timestamp timestamp with time zone NOT NULL,
     CONSTRAINT users_pkey PRIMARY KEY (id),
-    CONSTRAINT unique_username UNIQUE (username)
+    CONSTRAINT unique_username UNIQUE (username),
+    CONSTRAINT fk_status_users FOREIGN KEY (id_status)
+        REFERENCES public.status (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID
 )
 
 TABLESPACE pg_default;
 
 ALTER TABLE public.users
     OWNER to postgres;
+-- Index: fki_fk_status_users
+
+-- DROP INDEX public.fki_fk_status_users;
+
+CREATE INDEX fki_fk_status_users
+    ON public.users USING btree
+    (id_status ASC NULLS LAST)
+    TABLESPACE pg_default;

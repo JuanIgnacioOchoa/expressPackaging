@@ -16,16 +16,15 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.use(function(req, res, next) {
-  console.log("Header Security: ")
-  console.log(req.get('authorization'))
-  //console.log(req.headers)
-  console.log(req.headers.authorization)
-  if(!req.get('authorization')){
+  if(req.path.startsWith('/activate/user/')){
+    next();
+  } else if(!req.get('authorization')){
     return res.status(403).json({ error: 'authentication needed' });
   } else if(req.get('authorization') !== 'Basic dG9wZXhwcmVzczpramFvaXNkdTA5MW4yLG05eHUwOTEyM2w='){
     return res.status(401).json({ error: 'Invalid credentials.'})
+  } else {
+    next();
   }
-  next();
 });
 
 

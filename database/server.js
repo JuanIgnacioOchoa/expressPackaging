@@ -1,6 +1,6 @@
 const { Client } = require('pg')
-//host top-express-dev.cxsn0wvppdrz.us-east-2.rds.amazonaws.com
-//password Jiog040719
+//const host = "top-express-dev.cxsn0wvppdrz.us-east-2.rds.amazonaws.com"
+//const password = "Jiog040719"
 const password = (process.env.password || "9462");
 const host = (process.env.host || "juans-macbook-pro.local");
 console.log("Pass: ", password)
@@ -24,7 +24,7 @@ async function connect(){
         await client.connect();
         console.log("Connection succesful!")
     } catch(e) {
-        console.error(`Failed to connect ${e}`)
+        console.error(`TOPEXPRESSERROR: Failed to connect ${e}`)
     }
 }
 

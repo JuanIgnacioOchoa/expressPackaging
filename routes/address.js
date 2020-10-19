@@ -1,13 +1,15 @@
 var express = require('express');
 var router = express.Router();
-const user = require('../database/users/index');
+const address = require('../database/address/index');
 const status = require('../database/status')
 
-router.get('/user/address', async (req, res, next) => {
-  console.log(`/user/address/:m1/:m2 ${req.query.user}`)
-  //const result = await user.getAllUsers()
-  //res.setHeader("content-type", "application/json")
-  res.send(result)
-});
+router.post('/user/address/process', async function(req, res, next) {
+  console.log('insertNewAddress: ', req.body)
+  //console.log('insertNewAddress: ', req)
+
+  var response = await address.insertNewAddress(req.body)
+  console.log("Response: ", response)
+  res.send(response)
+})
 
 module.exports = router;
