@@ -56,14 +56,15 @@ function sendMail(email, confirmationString, idUser){
     const port = (process.env.PORT || "8762");
     var mailOptions = {
         from: 'dev8ag@gmail.com',
-        to: 'juanignacio8ag@gmail.com',
+        to: email,
         subject: 'Correco de activacion de Top Express',
         text: 'Bienvenido a top',
         html: `<h1>
           TopExpress
         </h1>
         <p>
-          Bienvenido a top express para activar su cuenta porfavor dele click al siguiente link <a href="${host}:${port}/activate/user/${idUser}/${confirmationString}">www.topexpress.com.mx/activate/user/${idUser}/${confirmationString}</a>
+          Bienvenido a top express para activar su cuenta porfavor dele click al siguiente link 
+            <a href="${host}:${port}/activate/user/${idUser}/${confirmationString}">www.topexpress.com.mx/activate/user/${idUser}/${confirmationString}</a>
           <br/>
           si no reconoces este servicio porfavor ignora este correo
         </p>`
