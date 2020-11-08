@@ -2,6 +2,7 @@ const client = require('../server')
 const status = require('../status')
 const moment = require('moment')
 const nodemailer = require('nodemailer');
+let aws = require('aws-sdk');
 const constants = require('../../constants')
 
 async function getAllUsers(){
@@ -45,20 +46,24 @@ function makeid(length) {
 }
 
 function sendMail(email, confirmationString, idUser){
+    
     var transporter = nodemailer.createTransport({
         service: 'gmail',
+        SES: new aws.SES({
+            apiVersion: '2010-12-01'
+        }),
         auth: {
             user: 'dev8ag@gmail.com',
             pass: 'Jiog040719'    
         }
     });
     const protocol = (process.env.protocol || "http://");
-    const host = (process.env.host || "juans-macbook-pro.local");
+    const host = (process.env.host || "juan8a.local");
     const port = (process.env.PORT || "8762");
     var mailOptions = {
         from: 'dev8ag@gmail.com',
         to: email,
-        subject: 'Correco de activacion de Top Express',
+        subject: 'Correo de activacion de Top Express',
         text: 'Bienvenido a top express',
         html: `<h1>
           TopExpress
@@ -81,7 +86,6 @@ function sendMail(email, confirmationString, idUser){
   
 
 async function processUser(body){
-    console.log("Body: ", body)
     try {
         const confirmationString = makeid(50)
         if(body.newUser){
@@ -94,11 +98,8 @@ async function processUser(body){
                 (username, password, name, lastname, email, mothermaidenname, phone, id_status, confirmation_string, confirmation_string_date, confirmation_date, created_timestamp, updated_timestamp)
                 values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`, values)
             //const results = await client.query(`SELECT * FROM public."users" WHERE username = $1 and password = $2`, [username, password])
-            console.log("1: ", results)
             delete results.rows[0].password
-            console.log("2")
             sendMail(email, confirmationString, results.rows[0].id)
-            console.log("3")
             return status.statusOperation(0, `Procesado Correctamente`, [], {users: results.rows})
         } else {
             const {username, password, name, lastname, email, mothermaidenname, phone, id, idStatus} = body.users[0]
