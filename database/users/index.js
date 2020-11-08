@@ -2,6 +2,7 @@ const client = require('../server')
 const status = require('../status')
 const moment = require('moment')
 const nodemailer = require('nodemailer');
+let aws = require('aws-sdk');
 const constants = require('../../constants')
 
 async function getAllUsers(){
@@ -48,16 +49,16 @@ function sendMail(email, confirmationString, idUser){
     
     var transporter = nodemailer.createTransport({
         service: 'gmail',
-        host: 'smtp.gmail.com',
-        port: 465,
-        secure: true,
+        SES: new aws.SES({
+            apiVersion: '2010-12-01'
+        }),
         auth: {
             user: 'dev8ag@gmail.com',
             pass: 'Jiog040719'    
         }
     });
     const protocol = (process.env.protocol || "http://");
-    const host = (process.env.host || "juans-macbook-pro.local");
+    const host = (process.env.host || "juan8a.local");
     const port = (process.env.PORT || "8762");
     var mailOptions = {
         from: 'dev8ag@gmail.com',
