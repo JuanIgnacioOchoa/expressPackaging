@@ -11,7 +11,6 @@ CREATE TABLE public."package"
     reference_number character varying COLLATE pg_catalog."default",
     description character varying COLLATE pg_catalog."default",
     quantity integer NOT NULL,
-    dimensions character varying COLLATE pg_catalog."default",
     total_cost numeric NOT NULL,
     shipping_cost numeric NOT NULL,
     package_cost numeric NOT NULL,
@@ -19,6 +18,7 @@ CREATE TABLE public."package"
     created_timestamp timestamp with time zone NOT NULL,
     updated_timestamp timestamp with time zone NOT NULL,
     id_status integer NOT NULL,
+    currency character varying COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT package_pkey PRIMARY KEY (id),
     CONSTRAINT fk_address_package FOREIGN KEY (id_address)
         REFERENCES public.address (id) MATCH SIMPLE

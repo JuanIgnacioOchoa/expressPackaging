@@ -5,7 +5,7 @@
 CREATE TABLE public.users
 (
     id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
-    username character varying COLLATE pg_catalog."default" NOT NULL,
+    username character varying COLLATE pg_catalog."default",
     password character varying COLLATE pg_catalog."default" NOT NULL,
     name character varying COLLATE pg_catalog."default" NOT NULL,
     lastname character varying COLLATE pg_catalog."default" NOT NULL,
@@ -24,7 +24,6 @@ CREATE TABLE public.users
         REFERENCES public.status (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
-        NOT VALID
 )
 
 TABLESPACE pg_default;

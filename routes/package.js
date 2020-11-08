@@ -61,9 +61,12 @@ router.post('/user/package', async (req, res, next) => {
 router.post('/package/process', upload.single('file'), async (req, res, next) => {
   console.log('/package/process', req.body)
   console.log('/package/process', req.file)
-  console.log('/package/process', req.body.file)
+  var path = undefined
+  if(req.file){
+    path = req.file.path
+  }
   //console.log('/package/process', req.body.newPackage)
-  const result = await package.processPackage(req.body)
+  const result = await package.processPackage(req.body, path)
   res.send(result)
 });
 

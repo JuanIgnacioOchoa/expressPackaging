@@ -47,13 +47,13 @@ async function processPackage(body, filePath){
         if(body.newPackage){
             
             var mysqlTimestamp = moment(Date.now());
-            const {idSupplier, idUser, idAddres, referenceNumber, description, quantity, totalCost, shipCost, packageCost, idStatus} = body
-            const values = [idSupplier, idUser, idAddres, referenceNumber, description, quantity, totalCost, shipCost, packageCost, filePath, idStatus,mysqlTimestamp, mysqlTimestamp]
+            const {idSupplier, idUser, idAddress, referenceNumber, description, quantity, totalCost, shipCost, packageCost, idStatus, currency} = body
+            const values = [idSupplier, idUser, idAddress, referenceNumber, description, quantity, totalCost, shipCost, packageCost, filePath, idStatus, currency, mysqlTimestamp, mysqlTimestamp]
             console.log("Values: ", values)
             const results = await client.query(
                 `INSERT INTO public."package" 
-                (id_supplier, id_user, id_address, reference_number, description, quantity, total_cost, shipping_cost, package_cost, receipt, id_status, created_timestamp, updated_timestamp)
-                values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`, values)
+                (id_supplier, id_user, id_address, reference_number, description, quantity, total_cost, shipping_cost, package_cost, receipt, id_status, currency, created_timestamp, updated_timestamp)
+                values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *`, values)
             //console.log(results.rows[0])
             //console.log(results)
             return status.statusOperation(0, `Procesado Correctamente`, [], { packages: results.rows})

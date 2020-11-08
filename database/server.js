@@ -2,7 +2,7 @@ const { Client } = require('pg')
 //const host = "top-express-dev.cxsn0wvppdrz.us-east-2.rds.amazonaws.com"
 //const password = "Jiog040719"
 const password = (process.env.password || "9462");
-const host = (process.env.host || "juans-macbook-pro.local");
+const host = (process.env.host || "juan8a.local");
 console.log("Pass: ", password)
 console.log("Host: ", host)
 const client = new Client({
@@ -13,7 +13,7 @@ const client = new Client({
     "database": "topExpress"
 })
 
-start()
+start() 
 
 async function start(){
     await connect();
