@@ -46,7 +46,7 @@ function makeid(length) {
 }
 
 function sendMail(email, confirmationString, idUser){
-    
+    aws.config.update({region:'us-east-2'});
     var transporter = nodemailer.createTransport({
         service: 'gmail',
         SES: new aws.SES({
