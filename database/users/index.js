@@ -59,7 +59,7 @@ function sendMail(email, confirmationString, idUser){
         from: 'dev8ag@gmail.com',
         to: email,
         subject: 'Correco de activacion de Top Express',
-        text: 'Bienvenido a top',
+        text: 'Bienvenido a top express',
         html: `<h1>
           TopExpress
         </h1>
@@ -72,7 +72,7 @@ function sendMail(email, confirmationString, idUser){
     }
     transporter.sendMail(mailOptions, function(error, info) {
       if(error){
-        console.log(error)
+        console.log("Email error: " + error)
       } else {
         console.log("Email sent: " + info.response)
       }
