@@ -4,15 +4,20 @@ var express = require('express');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const bodyParser = require("body-parser");
+var multer = require('multer');
+var upload = multer();
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var addressRouter = require('./routes/address');
-const client = require('./database/server')
+var statusRouter = require('./routes/status');
+var packageRouter = require('./routes/package');
+var suppliersRouter = require('./routes/suppliers');
 const app = express();
 
+const status = require('./database/status')
 // view engine setup
 
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use(function(req, res, next) {
@@ -30,12 +35,17 @@ app.use(function(req, res, next) {
 
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+//app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+//app.use(upload.array()); 
+app.use(express.static('public'));
 
 app.use('/', indexRouter);
 app.use('/', usersRouter);
 app.use('/', addressRouter);
+app.use('/', statusRouter);
+app.use('/', packageRouter);
+app.use('/', suppliersRouter);
 
 
 // catch 404 and forward to error handler
@@ -45,13 +55,13 @@ app.use(function(req, res, next) {
 
 // error handler
 app.use(function(err, req, res, next) {
+  console.log("Error::::", err.message)
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
   // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+  res.send(status.statusOperation(5, 'Error en el endpoiint', [err.message], []))
 });
 
 var port = normalizePort(process.env.PORT || '8762');

@@ -52,18 +52,20 @@ function sendMail(email, confirmationString, idUser){
             pass: 'Jiog040719'    
         }
     });
+    const protocol = (process.env.protocol || "http://");
     const host = (process.env.host || "juans-macbook-pro.local");
     const port = (process.env.PORT || "8762");
     var mailOptions = {
         from: 'dev8ag@gmail.com',
-        to: 'juanignacio8ag@gmail.com',
+        to: email,
         subject: 'Correco de activacion de Top Express',
         text: 'Bienvenido a top',
         html: `<h1>
           TopExpress
         </h1>
         <p>
-          Bienvenido a top express para activar su cuenta porfavor dele click al siguiente link <a href="${host}:${port}/activate/user/${idUser}/${confirmationString}">www.topexpress.com.mx/activate/user/${idUser}/${confirmationString}</a>
+          Bienvenido a top express para activar su cuenta porfavor dele click al siguiente link 
+            <a href="${protocol}${host}:${port}/activate/user/${idUser}/${confirmationString}">www.topexpress.com.mx/activate/user/${idUser}/${confirmationString}</a>
           <br/>
           si no reconoces este servicio porfavor ignora este correo
         </p>`
@@ -87,13 +89,16 @@ async function processUser(body){
             const {username, password, name, lastname, email, mothermaidenname, phone, idStatus} = body.users[0]
             const values = [username, password, name, lastname, email, mothermaidenname, phone, idStatus, confirmationString, mysqlTimestamp, null, mysqlTimestamp, mysqlTimestamp]
             console.log("Values: ", values)
-            await client.query(
+            const results = await client.query(
                 `INSERT INTO public."users" 
                 (username, password, name, lastname, email, mothermaidenname, phone, id_status, confirmation_string, confirmation_string_date, confirmation_date, created_timestamp, updated_timestamp)
-                values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`, values)
-            const results = await client.query(`SELECT * FROM public."users" WHERE username = $1 and password = $2`, [username, password])
+                values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`, values)
+            //const results = await client.query(`SELECT * FROM public."users" WHERE username = $1 and password = $2`, [username, password])
+            console.log("1: ", results)
             delete results.rows[0].password
-            sendMail(email, confirmationString)
+            console.log("2")
+            sendMail(email, confirmationString, results.rows[0].id)
+            console.log("3")
             return status.statusOperation(0, `Procesado Correctamente`, [], {users: results.rows})
         } else {
             const {username, password, name, lastname, email, mothermaidenname, phone, id, idStatus} = body.users[0]
@@ -119,10 +124,11 @@ async function confirmUser(idUser, confirmationString){
         const usersRows = await client.query("Select * from public.users where confirmation_string = $1 and id = $2", [confirmationString, idUser])
         //console.log(usersRows)
         if(usersRows && usersRows.rows && usersRows.rows[0]){
-            const values = [constants.ACTIVO_ID, idUser]
+            var mysqlTimestamp = moment(Date.now());
+            const values = [constants.ACTIVO_ID, idUser, mysqlTimestamp, mysqlTimestamp]
             const result = await client.query(
                 `UPDATE public.users
-                SET id_status=$1
+                SET id_status=$1, confirmation_date = $3, updated_timestamp=$4
                 WHERE id=$2`, values
             )
             return status.statusOperation(0, `Procesado correctamente`,[], {})

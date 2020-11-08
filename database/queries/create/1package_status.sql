@@ -4,7 +4,7 @@
 
 CREATE TABLE public.package_status
 (
-    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    id integer NOT NULL,
     status character varying COLLATE pg_catalog."default" NOT NULL,
     description character varying COLLATE pg_catalog."default" NOT NULL,
     created_timestamp timestamp with time zone NOT NULL,

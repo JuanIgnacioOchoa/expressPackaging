@@ -16,13 +16,11 @@ CREATE TABLE public.history
     CONSTRAINT fk_package_history FOREIGN KEY (id_package)
         REFERENCES public."package" (id) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-        NOT VALID,
+        ON DELETE NO ACTION,
     CONSTRAINT fk_status_history FOREIGN KEY (id_status)
         REFERENCES public.package_status (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
-        NOT VALID
 )
 
 TABLESPACE pg_default;
