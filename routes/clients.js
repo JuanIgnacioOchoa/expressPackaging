@@ -4,10 +4,9 @@ const client = require('../database/clients/index');
 const status = require('../database/status')
 
 const nodemailer = require('nodemailer');
-const client = require('../database/server');
 
 /* GET home page. */
-router.post('/clients/login', async function(req, res, next) {
+router.post('/client/login', async function(req, res, next) {
   
   const { username, password } = req.body
   console.log(`${username} ${password}`)
