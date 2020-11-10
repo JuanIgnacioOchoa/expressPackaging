@@ -10,7 +10,7 @@ async function getAllStatus(){
         console.log('Query succeed')
         return status.statusOperation(0, `Procesado Correctamente`, [], { status: results.rows })
     } catch(e){
-        console.error(`TOPEXPRESSERROR: Failed at getAllUsers ${e}`)
+        console.error(`TOPEXPRESSERROR: Failed at getAllClients ${e}`)
         return status.statusOperation(2, `DatabaseOperation Error: `, [e], {status: []})
     }
 }

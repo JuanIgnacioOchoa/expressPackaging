@@ -5,33 +5,33 @@ const nodemailer = require('nodemailer');
 let aws = require('aws-sdk');
 const constants = require('../../constants')
 
-async function getAllUsers(){
+async function getAllClients(){
     console.log('getAllUser')
     try{
-        const results = await client.query('SELECT * FROM public."users"')
+        const results = await client.query('SELECT * FROM public."clients"')
         console.log('Query succeed')
-        return status.statusOperation(0, `Procesado Correctamente`, [], { users: results.rows })
+        return status.statusOperation(0, `Procesado Correctamente`, [], { clients: results.rows })
     } catch(e){
-        console.error(`TOPEXPRESSERROR: Failed at getAllUsers ${e}`)
-        return status.statusOperation(2, `DatabaseOperation Error: `, [e], {users: []})
+        console.error(`TOPEXPRESSERROR: Failed at getAllClients ${e}`)
+        return status.statusOperation(2, `DatabaseOperation Error: `, [e], {clients: []})
     }
 }
 
 async function loginUser(username, password){
     try{
-        const results = await client.query(`SELECT * FROM public."users" WHERE username = $1 and password = $2`, [username, password])
+        const results = await client.query(`SELECT * FROM public."clients" WHERE username = $1 and password = $2`, [username, password])
         if(results.rows.length > 0){
             delete results.rows[0].password
             const resultAddress = await client.query(`SELECT * FROM public."address" WHERE id_user = $1`, [results.rows[0].id])
             results.rows[0].address = resultAddress.rows
-            return status.statusOperation(0, `Procesado Correctamente`, [], {users: results.rows })
+            return status.statusOperation(0, `Procesado Correctamente`, [], {clients: results.rows })
         } else {
-            return status.statusOperation(5, `Usuario y/o contraseña incorrectos`, [], {users: results.rows})
+            return status.statusOperation(5, `Usuario y/o contraseña incorrectos`, [], {clients: results.rows})
         }
         
     } catch(e){
         console.error(`TOPEXPRESSERROR: Failed at loginUser ${e}`)
-        return status.statusOperation(2, `DatabaseOperation Error: `, [e], {users: []})
+        return status.statusOperation(2, `DatabaseOperation Error: `, [e], {clients: []})
     }
 }
 
@@ -90,45 +90,45 @@ async function processUser(body){
         const confirmationString = makeid(50)
         if(body.newUser){
             var mysqlTimestamp = moment(Date.now());
-            const {username, password, name, lastname, email, mothermaidenname, phone, idStatus} = body.users[0]
+            const {username, password, name, lastname, email, mothermaidenname, phone, idStatus} = body.clients[0]
             const values = [username, password, name, lastname, email, mothermaidenname, phone, idStatus, confirmationString, mysqlTimestamp, null, mysqlTimestamp, mysqlTimestamp]
             console.log("Values: ", values)
             const results = await client.query(
-                `INSERT INTO public."users" 
+                `INSERT INTO public."clients" 
                 (username, password, name, lastname, email, mothermaidenname, phone, id_status, confirmation_string, confirmation_string_date, confirmation_date, created_timestamp, updated_timestamp)
                 values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`, values)
-            //const results = await client.query(`SELECT * FROM public."users" WHERE username = $1 and password = $2`, [username, password])
+            //const results = await client.query(`SELECT * FROM public."clients" WHERE username = $1 and password = $2`, [username, password])
             delete results.rows[0].password
             sendMail(email, confirmationString, results.rows[0].id)
-            return status.statusOperation(0, `Procesado Correctamente`, [], {users: results.rows})
+            return status.statusOperation(0, `Procesado Correctamente`, [], {clients: results.rows})
         } else {
-            const {username, password, name, lastname, email, mothermaidenname, phone, id, idStatus} = body.users[0]
+            const {username, password, name, lastname, email, mothermaidenname, phone, id, idStatus} = body.clients[0]
             const values = [username, password, name, lastname, email, mothermaidenname, phone, idStatus, id]
             await client.query(
-                `UPDATE public.users
+                `UPDATE public.clients
                 SET username=$1, password=$2, name=$3, lastname=$4, email=$5, mothermaidenname=$6, phone=$7, id_status=$8
                 WHERE id=$9`, values
             )
-            const results = await client.query(`SELECT * FROM public."users" WHERE username = $1 and password = $2`, [username, password])
+            const results = await client.query(`SELECT * FROM public."clients" WHERE username = $1 and password = $2`, [username, password])
             delete results.rows[0].password
-            return status.statusOperation(0, `Procesado Correctamente`, [], {users: results.rows})
+            return status.statusOperation(0, `Procesado Correctamente`, [], {clients: results.rows})
         }
     } catch(e){
         console.error(`TOPEXPRESSERROR: Failed at processUser ${e}`)
-        return status.statusOperation(2, `DatabaseOperation Error: `, [e], {users: []})
+        return status.statusOperation(2, `DatabaseOperation Error: `, [e], {clients: []})
     }
 }
 
 async function confirmUser(idUser, confirmationString){
     console.log("confirmUser: ", idUser, confirmationString)
     try{
-        const usersRows = await client.query("Select * from public.users where confirmation_string = $1 and id = $2", [confirmationString, idUser])
-        //console.log(usersRows)
-        if(usersRows && usersRows.rows && usersRows.rows[0]){
+        const clientsRows = await client.query("Select * from public.clients where confirmation_string = $1 and id = $2", [confirmationString, idUser])
+        //console.log(clientsRows)
+        if(clientsRows && clientsRows.rows && clientsRows.rows[0]){
             var mysqlTimestamp = moment(Date.now());
             const values = [constants.ACTIVO_ID, idUser, mysqlTimestamp, mysqlTimestamp]
             const result = await client.query(
-                `UPDATE public.users
+                `UPDATE public.clients
                 SET id_status=$1, confirmation_date = $3, updated_timestamp=$4
                 WHERE id=$2`, values
             )
@@ -141,7 +141,7 @@ async function confirmUser(idUser, confirmationString){
     }
 }
 
-exports.getAllUsers = getAllUsers
+exports.getAllClients = getAllClients
 exports.loginUser = loginUser
 exports.processUser = processUser
 exports.confirmUser = confirmUser

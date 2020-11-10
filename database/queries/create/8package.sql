@@ -34,7 +34,7 @@ CREATE TABLE public."package"
         ON UPDATE NO ACTION
         ON DELETE NO ACTION,
     CONSTRAINT fk_user_package FOREIGN KEY (id_user)
-        REFERENCES public.users (id) MATCH SIMPLE
+        REFERENCES public.clients (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
 )

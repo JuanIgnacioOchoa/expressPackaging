@@ -1,10 +1,10 @@
-INSERT INTO public.users(
+INSERT INTO public.clients(
 	username, password, name, lastname, email, mothermaidenname, phone, id_status, confirmation_string, confirmation_string_date, confirmation_date, created_timestamp, updated_timestamp)
 	VALUES (
-			'francisco-aceves', --username
+			'ivana-jimenez', --username
 			'mayueth', --pasword
-			'Francisco', --name
-			'Aceves', --lastname
+			'Ivana', --name
+			'Jimenez', --lastname
 			null, --email
 			null, --mothermaidenname
 			null, --phone

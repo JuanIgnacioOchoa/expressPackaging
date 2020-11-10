@@ -7,7 +7,7 @@ const bodyParser = require("body-parser");
 var multer = require('multer');
 var upload = multer();
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+var clientsRouter = require('./routes/clients');
 var addressRouter = require('./routes/address');
 var statusRouter = require('./routes/status');
 var packageRouter = require('./routes/package');
@@ -41,7 +41,7 @@ app.use(cookieParser());
 app.use(express.static('public'));
 
 app.use('/', indexRouter);
-app.use('/', usersRouter);
+app.use('/', clientsRouter);
 app.use('/', addressRouter);
 app.use('/', statusRouter);
 app.use('/', packageRouter);

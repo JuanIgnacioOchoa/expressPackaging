@@ -25,7 +25,7 @@ CREATE TABLE public.address
         ON UPDATE NO ACTION
         ON DELETE NO ACTION,
     CONSTRAINT user_address FOREIGN KEY (id_user)
-        REFERENCES public.users (id) MATCH SIMPLE
+        REFERENCES public.clients (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
 )

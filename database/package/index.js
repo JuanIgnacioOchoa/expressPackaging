@@ -19,11 +19,11 @@ async function getUserPackages(idUser){
     try {
         const resultsActive = await client.query(`
         SELECT p.*, s.name as supplier_name, ps.status as status
-            from public."package" as p, public."users" as u, public."suppliers" as s, public."package_status" as ps
+            from public."package" as p, public."clients" as u, public."suppliers" as s, public."package_status" as ps
                 WHERE u.id = p.id_user and s.id = p.id_supplier and ps.id = p.id_status and ps.id <> $1 --and u.id = $1`, [constants.ENTREGADO_ID/*idUser*/])
         const resultsDelivered = await client.query(`
         SELECT p.*, s.name as supplier_name, ps.status as status
-            from public."package" as p, public."users" as u, public."suppliers" as s, public."package_status" as ps
+            from public."package" as p, public."clients" as u, public."suppliers" as s, public."package_status" as ps
                 WHERE u.id = p.id_user and s.id = p.id_supplier and ps.id = p.id_status and ps.id = $1 --and u.id = $1`, [constants.ENTREGADO_ID/*idUser*/])
         return status.statusOperation(0, `Procesado Correctamente`, [], { packages: { delivered : resultsDelivered.rows, active: resultsActive.rows     } })
     } catch(e){
@@ -58,10 +58,10 @@ async function processPackage(body, filePath){
             //console.log(results)
             return status.statusOperation(0, `Procesado Correctamente`, [], { packages: results.rows})
         } else {
-            const {username, password, name, lastname, email, mothermaidenname, phone, id, idStatus} = body.users[0]
+            const {username, password, name, lastname, email, mothermaidenname, phone, id, idStatus} = body.clients[0]
             const values = [username, password, name, lastname, email, mothermaidenname, phone, idStatus, id]
             await client.query(
-                `UPDATE public.users
+                `UPDATE public.clients
                 SET username=$1, password=$2, name=$3, lastname=$4, email=$5, mothermaidenname=$6, phone=$7, id_status=$8
                 WHERE id=$9`, values
             )

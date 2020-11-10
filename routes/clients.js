@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-const user = require('../database/users/index');
+const user = require('../database/clients/index');
 const status = require('../database/status')
 
 const nodemailer = require('nodemailer');
@@ -39,7 +39,7 @@ router.post('/user/process', async function(req, res, next) {
 
 router.get('/user/all', async (req, res, next) => {
   console.log("/user/all:")
-  const result = await user.getAllUsers()
+  const result = await user.getAllClients()
   res.send(result)
 });
 

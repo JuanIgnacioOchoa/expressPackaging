@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-const user = require('../database/users/index');
+const user = require('../database/clients/index');
 const package = require('../database/package/index');
 const statusOperation = require('../database/status')
 var multer = require('multer');
