@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-const user = require('../database/clients/index');
+const client = require('../database/clients/index');
 const package = require('../database/package/index');
 const statusOperation = require('../database/status')
 var multer = require('multer');
@@ -45,13 +45,13 @@ router.get('/package/status/all', async (req, res, next) => {
     res.send(result)
 });
   
-router.post('/user/package', async (req, res, next) => {
-  console.log('/user/package', req.body)
+router.post('/client/package', async (req, res, next) => {
+  console.log('/client/package', req.body)
   var result
-  if(!req.body.idUser){
+  if(!req.body.idClient){
     result = statusOperation.statusOperation(0, `Error en datos`, ['el id de usuario es requerido'], { packages: [] })
   } else {
-    result = await package.getUserPackages(req.body.idUser)
+    result = await package.getClientPackages(req.body.idClient)
   }
   res.send(result)
 });

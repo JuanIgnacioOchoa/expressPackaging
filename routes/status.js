@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-const user = require('../database/clients/index');
+const client = require('../database/clients/index');
 const status = require('../database/status/index');
 const statusOperation = require('../database/status')
 

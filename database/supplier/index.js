@@ -5,7 +5,7 @@ const nodemailer = require('nodemailer');
 const constants = require('../../constants')
 
 async function getAllSupliers(){
-    console.log('getAllUser')
+    console.log('getAllSuppliers')
     try{
         const results = await client.query('SELECT * FROM public."suppliers"')
         console.log('Query succeed')

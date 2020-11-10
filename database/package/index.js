@@ -15,19 +15,19 @@ async function getAllPackageStatus(){
     }
 }
 
-async function getUserPackages(idUser){
+async function getClientPackages(idClient){
     try {
         const resultsActive = await client.query(`
         SELECT p.*, s.name as supplier_name, ps.status as status
             from public."package" as p, public."clients" as u, public."suppliers" as s, public."package_status" as ps
-                WHERE u.id = p.id_user and s.id = p.id_supplier and ps.id = p.id_status and ps.id <> $1 --and u.id = $1`, [constants.ENTREGADO_ID/*idUser*/])
+                WHERE u.id = p.id_client and s.id = p.id_supplier and ps.id = p.id_status and ps.id <> $1 and u.id = $2`, [constants.ENTREGADO_ID, idClient])
         const resultsDelivered = await client.query(`
         SELECT p.*, s.name as supplier_name, ps.status as status
             from public."package" as p, public."clients" as u, public."suppliers" as s, public."package_status" as ps
-                WHERE u.id = p.id_user and s.id = p.id_supplier and ps.id = p.id_status and ps.id = $1 --and u.id = $1`, [constants.ENTREGADO_ID/*idUser*/])
+                WHERE u.id = p.id_client and s.id = p.id_supplier and ps.id = p.id_status and ps.id = $1 and u.id = $2`, [constants.ENTREGADO_ID, idClient])
         return status.statusOperation(0, `Procesado Correctamente`, [], { packages: { delivered : resultsDelivered.rows, active: resultsActive.rows     } })
     } catch(e){
-        console.error(`TOPEXPRESSERROR: Failed at getUserPackages ${e}`)
+        console.error(`TOPEXPRESSERROR: Failed at getClientPackages ${e}`)
         return status.statusOperation(2, `DatabaseOperation Error: `, [e], {status: []})
     }
 }
@@ -47,12 +47,12 @@ async function processPackage(body, filePath){
         if(body.newPackage){
             
             var mysqlTimestamp = moment(Date.now());
-            const {idSupplier, idUser, idAddress, referenceNumber, description, quantity, totalCost, shipCost, packageCost, idStatus, currency} = body
-            const values = [idSupplier, idUser, idAddress, referenceNumber, description, quantity, totalCost, shipCost, packageCost, filePath, idStatus, currency, mysqlTimestamp, mysqlTimestamp]
+            const {idSupplier, idClient, idAddress, referenceNumber, description, quantity, totalCost, shipCost, packageCost, idStatus, currency} = body
+            const values = [idSupplier, idClient, idAddress, referenceNumber, description, quantity, totalCost, shipCost, packageCost, filePath, idStatus, currency, mysqlTimestamp, mysqlTimestamp]
             console.log("Values: ", values)
             const results = await client.query(
                 `INSERT INTO public."package" 
-                (id_supplier, id_user, id_address, reference_number, description, quantity, total_cost, shipping_cost, package_cost, receipt, id_status, currency, created_timestamp, updated_timestamp)
+                (id_supplier, id_client, id_address, reference_number, description, quantity, total_cost, shipping_cost, package_cost, receipt, id_status, currency, created_timestamp, updated_timestamp)
                 values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *`, values)
             //console.log(results.rows[0])
             //console.log(results)
@@ -78,20 +78,5 @@ async function processPackage(body, filePath){
     }
 }
 exports.getAllPackageStatus = getAllPackageStatus
-exports.getUserPackages = getUserPackages
+exports.getClientPackages = getClientPackages
 exports.processPackage = processPackage
-
-/*
-                    "id": 2,
-                    "id_supplier": 1,
-                    "id_user": 1,
-                    "id_address": null,
-                    "reference_number": null,
-                    "description": "chamarras",
-                    "quantity": 15,
-                    "dimensions": null,
-                    "total_cost": "234.32",
-                    "shipping_cost": "39",
-                    "package_cost": "195.32",
-                    "receipt": null,
-*/

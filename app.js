@@ -21,7 +21,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use(function(req, res, next) {
-  if(req.path.startsWith('/activate/user/')){
+  if(req.path.startsWith('/activate/client/')){
     next();
   } else if(!req.get('authorization')){
     return res.status(403).json({ error: 'authentication needed' });

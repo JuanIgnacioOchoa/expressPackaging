@@ -3,7 +3,7 @@ var router = express.Router();
 const address = require('../database/address/index');
 const status = require('../database/status')
 
-router.post('/user/address/process', async function(req, res, next) {
+router.post('/client/address/process', async function(req, res, next) {
   console.log('insertNewAddress: ', req.body)
   //console.log('insertNewAddress: ', req)
 

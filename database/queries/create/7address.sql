@@ -13,7 +13,7 @@ CREATE TABLE public.address
     state character varying COLLATE pg_catalog."default" NOT NULL,
     country character varying COLLATE pg_catalog."default" NOT NULL,
     additional_info character varying COLLATE pg_catalog."default",
-    id_user integer,
+    id_client integer,
     created_timestamp timestamp with time zone NOT NULL,
     updated_timestamp timestamp with time zone NOT NULL,
     contact_number character varying COLLATE pg_catalog."default",
@@ -24,7 +24,7 @@ CREATE TABLE public.address
         REFERENCES public.status (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION,
-    CONSTRAINT user_address FOREIGN KEY (id_user)
+    CONSTRAINT client_address FOREIGN KEY (id_client)
         REFERENCES public.clients (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
@@ -42,11 +42,11 @@ CREATE INDEX fki_fk_status_address
     ON public.address USING btree
     (id_status ASC NULLS LAST)
     TABLESPACE pg_default;
--- Index: fki_user_address
+-- Index: fki_client_address
 
--- DROP INDEX public.fki_user_address;
+-- DROP INDEX public.fki_client_address;
 
-CREATE INDEX fki_user_address
+CREATE INDEX fki_client_address
     ON public.address USING btree
-    (id_user ASC NULLS LAST)
+    (id_client ASC NULLS LAST)
     TABLESPACE pg_default;

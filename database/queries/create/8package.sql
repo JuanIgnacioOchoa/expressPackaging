@@ -6,7 +6,7 @@ CREATE TABLE public."package"
 (
     id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
     id_supplier integer NOT NULL,
-    id_user integer NOT NULL,
+    id_client integer NOT NULL,
     id_address integer,
     reference_number character varying COLLATE pg_catalog."default",
     description character varying COLLATE pg_catalog."default",
@@ -33,7 +33,7 @@ CREATE TABLE public."package"
         REFERENCES public.suppliers (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION,
-    CONSTRAINT fk_user_package FOREIGN KEY (id_user)
+    CONSTRAINT fk_client_package FOREIGN KEY (id_client)
         REFERENCES public.clients (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
@@ -67,11 +67,11 @@ CREATE INDEX fki_fk_supllier_package
     ON public."package" USING btree
     (id_supplier ASC NULLS LAST)
     TABLESPACE pg_default;
--- Index: fki_fk_user_package
+-- Index: fki_fk_client_package
 
--- DROP INDEX public.fki_fk_user_package;
+-- DROP INDEX public.fki_fk_client_package;
 
-CREATE INDEX fki_fk_user_package
+CREATE INDEX fki_fk_client_package
     ON public."package" USING btree
-    (id_user ASC NULLS LAST)
+    (id_client ASC NULLS LAST)
     TABLESPACE pg_default;
