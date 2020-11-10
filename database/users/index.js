@@ -79,7 +79,7 @@ function sendMail(email, confirmationString, idUser){
       if(error){
         console.log("Email error: " + error)
       } else {
-        console.log("Email sent: " + info.response)
+        console.log("Email sent: " + email + " " + info.response)
       }
     })
   }
