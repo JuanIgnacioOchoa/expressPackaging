@@ -22,7 +22,7 @@ async function loginClient(username, password){
         const results = await client.query(`SELECT * FROM public."clients" WHERE username = $1 and password = $2`, [username, password])
         if(results.rows.length > 0){
             delete results.rows[0].password
-            const resultAddress = await client.query(`SELECT * FROM public."address" WHERE id_client = $1`, [results.rows[0].id])
+            const resultAddress = await client.query(`SELECT * FROM public."address" WHERE id_client = $1 or id = 1 order by id `, [results.rows[0].id])
             results.rows[0].address = resultAddress.rows
             return status.statusOperation(0, `Procesado Correctamente`, [], {clients: results.rows })
         } else {
