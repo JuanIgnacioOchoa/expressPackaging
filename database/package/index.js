@@ -35,7 +35,7 @@ async function getClientPackages(idClient){
 
 async function processPackage(body, filePath){
     try {
-        if(body.idSupplier == 0){
+        if(body.idSupplier == undefined){
             const newSupplier = await supplier.insertSupplier(body.supplierName)
             console.log("New Supplier: ", newSupplier.data.suppliers[0].id)
             if(newSupplier.statusOperation.code == 0){
