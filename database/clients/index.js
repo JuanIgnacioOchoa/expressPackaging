@@ -57,9 +57,12 @@ function sendMail(email, confirmationString, idClient){
             pass: 'Jiog040719'    
         }
     });
+    /*
     const protocol = (process.env.protocol || "http://");
     const host = (process.env.host || "juan8a.local");
     const port = (process.env.PORT || "8762");
+    */
+   const host = "http://topexpressqa-env.eba-dcnvmavd.us-east-2.elasticbeanstalk.com"
     var mailOptions = {
         from: 'dev8ag@gmail.com',
         to: email,
@@ -70,7 +73,7 @@ function sendMail(email, confirmationString, idClient){
         </h1>
         <p>
           Bienvenido a top express para activar su cuenta porfavor dele click al siguiente link 
-            <a href="${protocol}${host}:${port}/activate/client/${idClient}/${confirmationString}">www.topexpress.com.mx/activate/client/${idClient}/${confirmationString}</a>
+            <a href="${host}/activate/client/${idClient}/${confirmationString}">www.topexpress.com.mx/activate/client/${idClient}/${confirmationString}</a>
           <br/>
           si no reconoces este servicio porfavor ignora este correo
         </p>`
