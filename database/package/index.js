@@ -77,6 +77,34 @@ async function processPackage(body, filePath){
         
     }
 }
+
+async function findPackages(body){
+    try {
+        /*
+        if(body.idSupplier == 0){
+            const newSupplier = await supplier.insertSupplier(body.supplierName)
+            console.log("New Supplier: ", newSupplier.data.suppliers[0].id)
+            if(newSupplier.statusOperation.code == 0){
+                body.idSupplier = newSupplier.data.suppliers[0].id
+            } else {
+                return status.statusOperation(2, `Error en provvedor Error: `, ['El proveedor no existia y hubo un error al crearlo'], {packages: []})
+            }
+        }
+        */
+        const results = await client.query(`SELECT p.*, c.name, c.lastname, ps.status
+        FROM public."package" as p, public."clients" as c, public."package_status" as ps
+        WHERE p.id_client = c.id and p.id_status = ps.id`)
+        //console.log(results.rows[0])
+        //console.log(results)
+        return status.statusOperation(0, `Procesado Correctamente`, [], { packages: results.rows})
+    } catch(e){
+        
+        console.error(`TOPEXPRESSERROR: Failed at processPackage ${e}`)
+        return status.statusOperation(2, `DatabaseOperation Error: `, [e], {packages: []})
+        
+    }
+}
 exports.getAllPackageStatus = getAllPackageStatus
 exports.getClientPackages = getClientPackages
 exports.processPackage = processPackage
+exports.findPackages = findPackages

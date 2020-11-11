@@ -70,5 +70,11 @@ router.post('/package/process', upload.single('file'), async (req, res, next) =>
   res.send(result)
 });
 
+router.post('/packages/find', async (req, res, next) => {
+  console.log('/package/find', req.body)
+
+  const result = await package.findPackages(req.body)
+  res.send(result)
+})
 
 module.exports = router;

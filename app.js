@@ -1,5 +1,6 @@
 var createError = require('http-errors');
 var express = require('express');
+
 //var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
@@ -12,11 +13,13 @@ var addressRouter = require('./routes/address');
 var statusRouter = require('./routes/status');
 var packageRouter = require('./routes/package');
 var suppliersRouter = require('./routes/suppliers');
+var cors = require('cors')
 const app = express();
 
 const status = require('./database/status')
 // view engine setup
 
+app.use(cors())
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
