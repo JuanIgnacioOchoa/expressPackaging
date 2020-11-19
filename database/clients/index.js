@@ -46,46 +46,89 @@ function makeid(length) {
 }
 
 function sendMail(email, confirmationString, idClient){
-    aws.config.update({region:'us-east-2'});
-    var transporter = nodemailer.createTransport({
-        service: 'gmail',
-        SES: new aws.SES({
-            apiVersion: '2010-12-01'
-        }),
-        auth: {
-            user: 'dev8ag@gmail.com',
-            pass: 'Jiog040719'    
+    if(process.env.host ){
+        aws.config.update({region:'us-east-2'});
+        var transporter = nodemailer.createTransport({
+            service: 'gmail',
+            SES: new aws.SES({
+                apiVersion: '2010-12-01'
+            }),
+            auth: {
+                user: 'dev8ag@gmail.com',
+                pass: 'Jiog040719'    
+            }
+        });
+        /*
+        const protocol = (process.env.protocol || "http://");
+        const host = (process.env.host || "juan8a.local");
+        const port = (process.env.PORT || "8762");
+        */
+       const host = "http://topexpressqa-env.eba-dcnvmavd.us-east-2.elasticbeanstalk.com"
+        var mailOptions = {
+            from: 'dev8ag@gmail.com',
+            to: email,
+            subject: 'Correo de activacion de Top Express',
+            text: 'Bienvenido a top express',
+            html: `<h1>
+              TopExpress
+            </h1>
+            <p>
+              Bienvenido a top express para activar su cuenta porfavor dele click al siguiente link 
+                <a href="${host}/activate/client/${idClient}/${confirmationString}">www.topexpress.com.mx/activate/client/${idClient}/${confirmationString}</a>
+              <br/>
+              si no reconoces este servicio porfavor ignora este correo
+            </p>`
         }
-    });
-    /*
-    const protocol = (process.env.protocol || "http://");
-    const host = (process.env.host || "juan8a.local");
-    const port = (process.env.PORT || "8762");
-    */
-   const host = "http://topexpressqa-env.eba-dcnvmavd.us-east-2.elasticbeanstalk.com"
-    var mailOptions = {
-        from: 'dev8ag@gmail.com',
-        to: email,
-        subject: 'Correo de activacion de Top Express',
-        text: 'Bienvenido a top express',
-        html: `<h1>
-          TopExpress
-        </h1>
-        <p>
-          Bienvenido a top express para activar su cuenta porfavor dele click al siguiente link 
-            <a href="${host}/activate/client/${idClient}/${confirmationString}">www.topexpress.com.mx/activate/client/${idClient}/${confirmationString}</a>
-          <br/>
-          si no reconoces este servicio porfavor ignora este correo
-        </p>`
+        transporter.sendMail(mailOptions, function(error, info) {
+          if(error){
+            console.log("Email error: " + error)
+          } else {
+            console.log("Email sent: " + email + " " + info.response)
+          }
+        })
+    } else {
+        //aws.config.update({region:'us-east-2'});
+        var transporter = nodemailer.createTransport({
+            service: 'gmail',
+            //SES: new aws.SES({
+            //    apiVersion: '2010-12-01'
+            //}),
+            auth: {
+                user: 'dev8ag@gmail.com',
+                pass: 'Jiog040719'    
+            }
+        });
+        /*
+        const protocol = (process.env.protocol || "http://");
+        const host = (process.env.host || "juan8a.local");
+        const port = (process.env.PORT || "8762");
+        */
+       const host = "http://topexpressqa-env.eba-dcnvmavd.us-east-2.elasticbeanstalk.com"
+        var mailOptions = {
+            from: 'dev8ag@gmail.com',
+            to: email,
+            subject: 'Correo de activacion de Top Express',
+            text: 'Bienvenido a top express',
+            html: `<h1>
+              TopExpress
+            </h1>
+            <p>
+              Bienvenido a top express para activar su cuenta porfavor dele click al siguiente link 
+                <a href="${host}/activate/client/${idClient}/${confirmationString}">www.topexpress.com.mx/activate/client/${idClient}/${confirmationString}</a>
+              <br/>
+              si no reconoces este servicio porfavor ignora este correo
+            </p>`
+        }
+        transporter.sendMail(mailOptions, function(error, info) {
+          if(error){
+            console.log("Email error: " + error)
+          } else {
+            console.log("Email sent: " + email + " " + info.response)
+          }
+        })
     }
-    transporter.sendMail(mailOptions, function(error, info) {
-      if(error){
-        console.log("Email error: " + error)
-      } else {
-        console.log("Email sent: " + email + " " + info.response)
-      }
-    })
-  }
+
+}
   
 
 async function processClient(body){

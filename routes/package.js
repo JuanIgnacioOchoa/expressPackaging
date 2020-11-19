@@ -6,17 +6,17 @@ const statusOperation = require('../database/status')
 var multer = require('multer');
 
 const storage = multer.diskStorage({
+  
   destination: function(req, file, cb) {
       cb(null, './upload/');
   },
 
   // By default, multer removes file extensions so let's add them back
   filename: function(req, file, cb) {
-
-    console.log('storage');
     //cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
     //cb(null, new Date().toISOString() + file.originalname)
-    cb(null, 'abcd.jpeg')
+    const s = new Date().toISOString()
+    cb(null, req.body.id + s + '.jpeg')
   }
 });
 
@@ -58,22 +58,30 @@ router.post('/client/package', async (req, res, next) => {
 
 
 
-router.post('/package/process', upload.single('file'), async (req, res, next) => {
+router.post('/package/process', async (req, res, next) => {
   console.log('/package/process', req.body)
-  console.log('/package/process', req.file)
+  //console.log('/package/process', req.body.newPackage)
+  const result = await package.processPackage(req.body)
+  res.send(result)
+});
+
+router.post('/package/process/file', upload.single('file'), async (req, res, next) => {
+  console.log('/package/process/file', req.body.id)
+  console.log('/package/process/file', req.file)
   var path = undefined
   if(req.file){
     path = req.file.path
   }
+  const id = req.body.id
   //console.log('/package/process', req.body.newPackage)
-  const result = await package.processPackage(req.body, path)
+  const result = await package.insertFile(id, path, req.file)
   res.send(result)
 });
 
 router.post('/packages/find', async (req, res, next) => {
   console.log('/package/find', req.body)
 
-  const result = await package.findPackages(req.body)
+  const result = await package.findPackages(req.file.path)
   res.send(result)
 })
 
