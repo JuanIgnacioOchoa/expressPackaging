@@ -13,20 +13,41 @@ const client = new Client({
     "database": "topExpress"
 })
 
-start() 
-
-async function start(){
-    await connect();
-}
-
-async function connect(){
-    try{
-        await client.connect();
-        console.log("Connection succesful!")
-    } catch(e) {
-        console.error(`TOPEXPRESSERROR: Failed to connect ${e}`)
+function sql() {
+    this.connect = function() {
+        return new Promise((resolve, reject) => reject("error connecting"));
     }
 }
+
+
+function connect() {
+    return new Promise((resolve, reject) => {
+        // const poolPromise = new sql.ConnectionPool("config.db");
+        const poolPromise = new sql();
+        poolPromise
+            .connect()
+            .then(pool => {
+                console.log("Connection succesful!")
+                resolve(pool);
+            })
+            .catch(err => {
+                console.error(`TOPEXPRESSERROR: Failed to connect ${err}`)
+                reject(err);
+            });
+    });
+}
+
+function establishConnection() {
+     var a = connect();
+     a.then(a => console.log("success"))
+    .catch(err => {
+        console.error("Retrying");
+        // I suggest using some variable to avoid the infinite loop.
+        setTimeout(establishConnection, 1000 * 60 * 5);
+    });
+};
+
+establishConnection();
 
 function statusOperation(statusOperationCode, description, errors, data){
     return{
