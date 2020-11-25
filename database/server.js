@@ -43,7 +43,7 @@ function establishConnection() {
     .catch(err => {
         console.error("Retrying");
         // I suggest using some variable to avoid the infinite loop.
-        setTimeout(establishConnection, 1000 * 60 * 5);
+        setTimeout(establishConnection, 1000 * 60 * 60 * 12);
     });
 };
 
