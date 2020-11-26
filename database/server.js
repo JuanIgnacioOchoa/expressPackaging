@@ -1,8 +1,8 @@
 const { Client } = require('pg')
-const host = "top-express-dev.cxsn0wvppdrz.us-east-2.rds.amazonaws.com"
-const password = "Jiog040719"
-//const password = (process.env.password || "9462");
-//const host = (process.env.host || "juan8a.local");
+//const host = "top-express-dev.cxsn0wvppdrz.us-east-2.rds.amazonaws.com"
+//const password = "Jiog040719"
+const password = (process.env.password || "9462");
+const host = (process.env.host || "juan8a.local");
 
 console.log("Pass: ", password)
 console.log("Host: ", host)

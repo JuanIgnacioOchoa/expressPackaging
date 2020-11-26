@@ -189,8 +189,8 @@ async function processPackage(body){
                     SELECT p.*, c.name as client_name, c.lastname, c.email, c.phone, s.name as supplier_name, a.address_line_1, a.int_number, a.city, a.state, a.country
                     FROM
                         public."package" as p, public."clients" as c, public."suppliers" as s, public."address" as a
-                    WHERE p.id = $1 and p.id_client = c.id and p.id_supplier = s.id and c.id = a.id_client
-                `, [results.rows[0].id])
+                    WHERE p.id = $1 and p.id_client = c.id and p.id_supplier = s.id and a.id = $2
+                `, [results.rows[0].id, idAddress])
             sendMail(resultSend.rows[0], "Top Express: Nuevo Paquete")
             return status.statusOperation(0, `Procesado Correctamente`, [], { packages: results.rows})
         } else {
@@ -214,7 +214,7 @@ async function processPackage(body){
     }
 }
 
-async function insertFile(id, path, file){
+async function insertFile(id, idAddress, path, file){
     try {
         const values = [path, id]
         await client.query(
@@ -229,8 +229,8 @@ async function insertFile(id, path, file){
                 SELECT p.*, c.name as client_name, c.lastname, c.email, c.phone, s.name as supplier_name, a.address_line_1, a.int_number, a.city, a.state, a.country
                 FROM
                     public."package" as p, public."clients" as c, public."suppliers" as s, public."address" as a
-                WHERE p.id = $1 and p.id_client = c.id and p.id_supplier = s.id and c.id = a.id_client
-            `, [results.rows[0].id])
+                WHERE p.id = $1 and p.id_client = c.id and p.id_supplier = s.id and a.id = $2
+            `, [results.rows[0].id, idAddress])
         sendMailWithImage(resultSend.rows[0], "Top Express: Nuevo Recibo", file)
         
         return status.statusOperation(0, `Procesado Correctamente`, [], {packages: results.rows})
