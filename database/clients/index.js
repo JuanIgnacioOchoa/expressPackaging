@@ -8,7 +8,11 @@ const constants = require('../../constants')
 async function getAllClients(){
     console.log('getAllClients')
     try{
-        const results = await client.query('SELECT * FROM public."clients"')
+        const results = await client.query(`
+        SELECT c.*, s.description as status 
+            FROM public.clients as c, public.status as s
+            WHERE c.id_status = s.id
+        `)
         console.log('Query succeed')
         return status.statusOperation(0, `Procesado Correctamente`, [], { clients: results.rows })
     } catch(e){
@@ -49,13 +53,18 @@ function sendMail(email, confirmationString, idClient){
     if(process.env.host ){
         aws.config.update({region:'us-east-2'});
         var transporter = nodemailer.createTransport({
-            service: 'gmail',
+            host: "smtp-mail.outlook.com", // hostname
+            secureConnection: false, // TLS requires secureConnection to be false
+            port: 587, // port for secure SMTP
+            tls: {
+            ciphers:'SSLv3'
+            },
             SES: new aws.SES({
                 apiVersion: '2010-12-01'
             }),
             auth: {
-                user: 'dev8ag@gmail.com',
-                pass: 'Jiog040719'    
+                user: 'topexpressgdl@hotmail.com',
+                pass: 'titanium502'    
             }
         });
         /*
@@ -65,7 +74,7 @@ function sendMail(email, confirmationString, idClient){
         */
        const host = "http://topexpressqa-env.eba-dcnvmavd.us-east-2.elasticbeanstalk.com"
         var mailOptions = {
-            from: 'dev8ag@gmail.com',
+            from: 'topexpressgdl@hotmail.com',
             to: email,
             subject: 'Correo de activacion de Top Express',
             text: 'Bienvenido a top express',
@@ -89,12 +98,12 @@ function sendMail(email, confirmationString, idClient){
     } else {
         //aws.config.update({region:'us-east-2'});
         var transporter = nodemailer.createTransport({
-            service: 'gmail',
+            host: "gmail", // hostname
             //SES: new aws.SES({
             //    apiVersion: '2010-12-01'
             //}),
             auth: {
-                user: 'dev8ag@gmail.com',
+                user: 'juanignacio8ag@gmail.com',
                 pass: 'Jiog040719'    
             }
         });
@@ -103,11 +112,11 @@ function sendMail(email, confirmationString, idClient){
         const host = (process.env.host || "juan8a.local");
         const port = (process.env.PORT || "8762");
         */
-       const host = "http://topexpressqa-env.eba-dcnvmavd.us-east-2.elasticbeanstalk.com"
+       const host = "http://juan8a.local:8762"
         var mailOptions = {
-            from: 'dev8ag@gmail.com',
+            from: 'juanignacio8ag@gmail.com',
             to: email,
-            subject: 'Correo de activacion de Top Express',
+            subject: 'PRUEBA Correo de activacion de Top Express',
             text: 'Bienvenido a top express',
             html: `<h1>
               TopExpress
@@ -134,11 +143,20 @@ function sendMail(email, confirmationString, idClient){
 async function processClient(body){
     try {
         const confirmationString = makeid(50)
-        if(body.newClient){
+        if(body.admin && body.newClient){
+            var mysqlTimestamp = moment(Date.now());
+            const {username, password, name, lastname, email, mothermaidenname, phone, idStatus} = body.clients[0]
+            const values = [username, password, name, lastname, email, mothermaidenname, phone, idStatus, mysqlTimestamp, null, mysqlTimestamp, mysqlTimestamp]
+            const results = await client.query(
+                `INSERT INTO public."clients" 
+                (username, password, name, lastname, email, mothermaidenname, phone, id_status, confirmation_string_date, confirmation_date, created_timestamp, updated_timestamp)
+                values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`, values)
+            delete results.rows[0].password
+            return status.statusOperation(0, `Procesado Correctamente`, [], {clients: results.rows})
+        } else if(body.newClient){
             var mysqlTimestamp = moment(Date.now());
             const {username, password, name, lastname, email, mothermaidenname, phone, idStatus} = body.clients[0]
             const values = [username, password, name, lastname, email, mothermaidenname, phone, idStatus, confirmationString, mysqlTimestamp, null, mysqlTimestamp, mysqlTimestamp]
-            console.log("Values: ", values)
             const results = await client.query(
                 `INSERT INTO public."clients" 
                 (username, password, name, lastname, email, mothermaidenname, phone, id_status, confirmation_string, confirmation_string_date, confirmation_date, created_timestamp, updated_timestamp)
@@ -148,14 +166,24 @@ async function processClient(body){
             sendMail(email, confirmationString, results.rows[0].id)
             return status.statusOperation(0, `Procesado Correctamente`, [], {clients: results.rows})
         } else {
+            var mysqlTimestamp = moment(Date.now());
             const {username, password, name, lastname, email, mothermaidenname, phone, id, idStatus} = body.clients[0]
-            const values = [username, password, name, lastname, email, mothermaidenname, phone, idStatus, id]
-            await client.query(
-                `UPDATE public.clients
-                SET username=$1, password=$2, name=$3, lastname=$4, email=$5, mothermaidenname=$6, phone=$7, id_status=$8
-                WHERE id=$9`, values
-            )
-            const results = await client.query(`SELECT * FROM public."clients" WHERE username = $1 and password = $2`, [username, password])
+            if(password != undefined && password != null){
+                const values = [username, password, name, lastname, email, mothermaidenname, phone, idStatus, mysqlTimestamp, id]
+                await client.query(
+                    `UPDATE public.clients
+                    SET username=$1, password=$2, name=$3, lastname=$4, email=$5, mothermaidenname=$6, phone=$7, id_status=$8, updated_timestamp=$9
+                    WHERE id=$10`, values
+                )
+            } else {
+                const values = [username, name, lastname, email, mothermaidenname, phone, idStatus, mysqlTimestamp, id]
+                await client.query(
+                    `UPDATE public.clients
+                    SET username=$1, name=$2, lastname=$3, email=$4, mothermaidenname=$5, phone=$6, id_status=$7, updated_timestamp=$8
+                    WHERE id=$9`, values
+                )
+            }
+            const results = await client.query(`SELECT * FROM public."clients" WHERE id = $1`, [id])
             delete results.rows[0].password
             return status.statusOperation(0, `Procesado Correctamente`, [], {clients: results.rows})
         }

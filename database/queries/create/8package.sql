@@ -19,22 +19,22 @@ CREATE TABLE public."package"
     updated_timestamp timestamp with time zone NOT NULL,
     id_status integer NOT NULL,
     currency character varying COLLATE pg_catalog."default" NOT NULL,
+    id_payment_status integer NOT NULL DEFAULT 539112279,
     CONSTRAINT package_pkey PRIMARY KEY (id),
     CONSTRAINT fk_address_package FOREIGN KEY (id_address)
         REFERENCES public.address (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION,
+    CONSTRAINT fk_client_package FOREIGN KEY (id_client)
+        REFERENCES public.clients (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
     CONSTRAINT fk_package_status_package FOREIGN KEY (id_status)
         REFERENCES public.package_status (id) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-        NOT VALID,
+        ON DELETE NO ACTION,
     CONSTRAINT fk_supllier_package FOREIGN KEY (id_supplier)
         REFERENCES public.suppliers (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION,
-    CONSTRAINT fk_client_package FOREIGN KEY (id_client)
-        REFERENCES public.clients (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
 )
@@ -51,6 +51,14 @@ CREATE INDEX fki_fk_address_package
     ON public."package" USING btree
     (id_address ASC NULLS LAST)
     TABLESPACE pg_default;
+-- Index: fki_fk_client_package
+
+-- DROP INDEX public.fki_fk_client_package;
+
+CREATE INDEX fki_fk_client_package
+    ON public."package" USING btree
+    (id_client ASC NULLS LAST)
+    TABLESPACE pg_default;
 -- Index: fki_fk_package_status_package
 
 -- DROP INDEX public.fki_fk_package_status_package;
@@ -66,12 +74,4 @@ CREATE INDEX fki_fk_package_status_package
 CREATE INDEX fki_fk_supllier_package
     ON public."package" USING btree
     (id_supplier ASC NULLS LAST)
-    TABLESPACE pg_default;
--- Index: fki_fk_client_package
-
--- DROP INDEX public.fki_fk_client_package;
-
-CREATE INDEX fki_fk_client_package
-    ON public."package" USING btree
-    (id_client ASC NULLS LAST)
     TABLESPACE pg_default;

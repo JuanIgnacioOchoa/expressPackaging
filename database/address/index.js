@@ -2,16 +2,23 @@ const client = require('../server')
 const status = require('../status')
 const moment = require('moment')
 
-async function getAddressByClientId(clientId){
-    try{
-        const results = await client.query('SELECT * FROM public."address" WHERE id_client = ?', [clientId])
-        return status.statusOperation(0, `Procesado Correctamente`, [], { clients: results.rows })
-    } catch(e){
-        console.error(`TOPEXPRESSERROR: Failed at getAllClients ${e}`)
-        return status.statusOperation(2, `DatabaseOperation Error: `, [e], {clients: []})
+async function findAddress(key, value){
+    console.log("Key: ", key)
+    console.log("Value: ", value)
+    switch(key){
+        case "CLIENT":
+            try{
+                const results = await client.query('SELECT * FROM public."address" WHERE id_client = $1', [value])
+                return status.statusOperation(0, `Procesado Correctamente`, [], { address: results.rows })
+            } catch(e){
+                console.error(`TOPEXPRESSERROR: Failed at findAddress ${e}`)
+                return status.statusOperation(2, `DatabaseOperation Error: `, [e], {address: []})
+            }
+            break;
+        default:
+            return status.statusOperation(2, `DatabaseOperation Error: `, [e], { address: []})
     }
 }
-
 async function insertNewAddress(body){
     console.log('insertNewAddress: ', body)
     if(body.newAddress){
@@ -40,3 +47,4 @@ async function insertNewAddress(body){
 }
 
 exports.insertNewAddress = insertNewAddress
+exports.findAddress = findAddress

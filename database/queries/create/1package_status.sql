@@ -9,6 +9,7 @@ CREATE TABLE public.package_status
     description character varying COLLATE pg_catalog."default" NOT NULL,
     created_timestamp timestamp with time zone NOT NULL,
     updated_timestamp timestamp with time zone NOT NULL,
+    type smallint NOT NULL,
     CONSTRAINT package_status_pkey PRIMARY KEY (id)
 )
 

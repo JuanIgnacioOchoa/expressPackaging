@@ -44,6 +44,12 @@ router.get('/package/status/all', async (req, res, next) => {
     const result = await package.getAllPackageStatus()
     res.send(result)
 });
+
+router.get('/package/paymentstatus/all', async (req, res, next) => {
+  console.log("/package/paymentstatus/all:")
+  const result = await package.getAllPaymentStatus()
+  res.send(result)
+});
   
 router.post('/client/package', async (req, res, next) => {
   console.log('/client/package', req.body)
@@ -79,9 +85,9 @@ router.post('/package/process/file', upload.single('file'), async (req, res, nex
 });
 
 router.post('/packages/find', async (req, res, next) => {
-  console.log('/package/find', req.body)
+  console.log('/package/find')
 
-  const result = await package.findPackages(req.file.path)
+  const result = await package.findPackages()
   res.send(result)
 })
 

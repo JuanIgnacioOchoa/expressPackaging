@@ -10,13 +10,18 @@ let aws = require('aws-sdk');
 function sendMailWithAws(mailOptions, email){
     aws.config.update({region:'us-east-2'});
     var transporter = nodemailer.createTransport({
-        service: 'gmail',
+        host: "smtp-mail.outlook.com", // hostname
+        secureConnection: false, // TLS requires secureConnection to be false
+        port: 587, // port for secure SMTP
+        tls: {
+        ciphers:'SSLv3'
+        },
         SES: new aws.SES({
             apiVersion: '2010-12-01'
         }),
         auth: {
-            user: 'dev8ag@gmail.com',
-            pass: 'Jiog040719'    
+            user: 'topexpressgdl@hotmail.com',
+            pass: 'titanium502'    
         }
     });
     const host = "http://topexpressqa-env.eba-dcnvmavd.us-east-2.elasticbeanstalk.com"
@@ -33,12 +38,12 @@ function sendMailWithAws(mailOptions, email){
 function sendLocalMail(mailOptions, email){
     //aws.config.update({region:'us-east-2'});
     var transporter = nodemailer.createTransport({
-        service: 'gmail',
+        host: "gmail", // hostname
         //SES: new aws.SES({
         //    apiVersion: '2010-12-01'
         //}),
         auth: {
-            user: 'dev8ag@gmail.com',
+            user: 'juanignacio8ag@gmail.com',
             pass: 'Jiog040719'    
         }
     });
@@ -53,12 +58,17 @@ function sendLocalMail(mailOptions, email){
     })
 }
 function sendMail(package, subject){
-    const email = 'dev8ag@gmail.com'
+    var email = 'topexpressgdl@hotmail.com'
+    var subjectTmp = subject
+    if(!process.env.host){
+        subjectTmp = "PRUEBA: " + subject
+        email = 'juanignacio8ag@gmail.com'
+    } 
     const address = package.address_line_1 + ' ' + package.int_number + ' ' + package.city + ' ' + package.state + ' ' + package.country
         var mailOptions = {
-            from: 'dev8ag@gmail.com',
+            from: email,
             to: email,
-            subject: subject,
+            subject: subjectTmp,
             html: `<h1>
             TopExpress
             </h1>
@@ -89,12 +99,17 @@ function sendMail(package, subject){
 }
 
 function sendMailWithImage(package, subject, file){
-    const email = 'dev8ag@gmail.com'
+    var email = 'topexpressgdl@hotmail.com'
     const address = package.address_line_1 + ' ' + package.int_number + ' ' + package.city + ' ' + package.state + ' ' + package.country
+    var subjectTmp = subject
+    if(!process.env.host){
+        subjectTmp = "PRUEBA: " + subject
+        email = 'juanignacio8ag@gmail.com'
+    } 
     var mailOptions = {
-        from: 'dev8ag@gmail.com',
+        from: email,
         to: email,
-        subject: subject,
+        subject: subjectTmp,
         html: `<h1>
             TopExpress
         </h1>
@@ -132,7 +147,18 @@ function sendMailWithImage(package, subject, file){
 
 async function getAllPackageStatus(){
     try{
-        const results = await client.query('SELECT * FROM public."package_status"')
+        const results = await client.query('SELECT * FROM public."package_status" where type = 1')
+        console.log('Query succeed')
+        return status.statusOperation(0, `Procesado Correctamente`, [], { status: results.rows })
+    } catch(e){
+        console.error(`TOPEXPRESSERROR: Failed at getAllPackageStatus ${e}`)
+        return status.statusOperation(2, `DatabaseOperation Error: `, [e], {status: []})
+    }
+}
+
+async function getAllPaymentStatus(){
+    try{
+        const results = await client.query('SELECT * FROM public."package_status" where type = 2')
         console.log('Query succeed')
         return status.statusOperation(0, `Procesado Correctamente`, [], { status: results.rows })
     } catch(e){
@@ -165,6 +191,7 @@ async function processPackage(body){
     try {
         if(package.idSupplier == undefined){
             const newSupplier = await supplier.insertSupplier(package.supplierName)
+            console.log("New Supplier: ", newSupplier)
             console.log("New Supplier: ", newSupplier.data.suppliers[0].id)
             if(newSupplier.statusOperation.code == 0){
                 package.idSupplier = newSupplier.data.suppliers[0].id
@@ -194,21 +221,24 @@ async function processPackage(body){
             sendMail(resultSend.rows[0], "Top Express: Nuevo Paquete")
             return status.statusOperation(0, `Procesado Correctamente`, [], { packages: results.rows})
         } else {
-            const {username, password, name, lastname, email, mothermaidenname, phone, id, idStatus} = body.clients[0]
-            const values = [username, password, name, lastname, email, mothermaidenname, phone, idStatus, id]
-            await client.query(
-                `UPDATE public.clients
-                SET username=$1, password=$2, name=$3, lastname=$4, email=$5, mothermaidenname=$6, phone=$7, id_status=$8
-                WHERE id=$9`, values
+            var mysqlTimestamp = moment(Date.now());
+            const {idSupplier, idClient, idAddress, referenceNumber, description, quantity, totalCost, shipCost, packageCost, idStatus, currency, idPaymentStatus, id} = body.packages[0]
+            const values = [idSupplier, idClient, idAddress, referenceNumber, description, quantity, totalCost, shipCost, packageCost, idStatus, currency, idPaymentStatus, mysqlTimestamp, id]
+            console.log("values 3: ", values)
+            const results = await client.query(
+                `UPDATE public."package"
+                SET id_supplier=$1, id_client=$2, id_address=$3, reference_number=$4, description=$5, quantity=$6, total_cost=$7, shipping_cost=$8, 
+                    package_cost=$9, id_status=$10, currency=$11, id_payment_status=$12, updated_timestamp=$13 
+                WHERE id=$14  RETURNING *`, values
             )
-            const results = await client.query(`SELECT * FROM public."package" WHERE username = $1 and password = $2`, [username, password])
-            delete results.rows[0].password
+            //const results = await client.query(`SELECT * FROM public."package" WHERE username = $1 and password = $2`, [username, password])
+            //delete results.rows[0].password
             return status.statusOperation(0, `Procesado Correctamente`, [], {packages: results.rows})
             
         }
     } catch(e){
         
-        console.error(`TOPEXPRESSERROR: Failed at processPackage ${e}`)
+        console.error(`TOPEXPRESSERROR: Failed at processPackage 1 ${e}`)
         return status.statusOperation(2, `DatabaseOperation Error: `, [e], {packages: []})
         
     }
@@ -238,14 +268,14 @@ async function insertFile(id, idAddress, path, file){
         
     } catch(e){
         
-        console.error(`TOPEXPRESSERROR: Failed at processPackage ${e}`)
+        console.error(`TOPEXPRESSERROR: Failed at processPackage 2 ${e}`)
         return status.statusOperation(2, `DatabaseOperation Error: `, [e], {packages: []})
         
     }
 
 }
 
-async function findPackages(body){
+async function findPackages(){
     try {
         /*
         if(body.idSupplier == 0){
@@ -266,12 +296,13 @@ async function findPackages(body){
         return status.statusOperation(0, `Procesado Correctamente`, [], { packages: results.rows})
     } catch(e){
         
-        console.error(`TOPEXPRESSERROR: Failed at processPackage ${e}`)
+        console.error(`TOPEXPRESSERROR: Failed at processPackage 3 ${e}`)
         return status.statusOperation(2, `DatabaseOperation Error: `, [e], {packages: []})
         
     }
 }
 exports.getAllPackageStatus = getAllPackageStatus
+exports.getAllPaymentStatus = getAllPaymentStatus
 exports.getClientPackages = getClientPackages
 exports.processPackage = processPackage
 exports.findPackages = findPackages
