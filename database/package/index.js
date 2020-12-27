@@ -28,7 +28,7 @@ function sendMailWithAws(mailOptions, email){
     
     transporter.sendMail(mailOptions, function(error, info) {
         if(error != null){
-            console.log("Email error: " + error)
+            console.log("Email error 1: " + error)
         } else {
             console.log("Email sent: " + email + " " + info.response)
         }
@@ -38,20 +38,18 @@ function sendMailWithAws(mailOptions, email){
 function sendLocalMail(mailOptions, email){
     //aws.config.update({region:'us-east-2'});
     var transporter = nodemailer.createTransport({
-        host: "gmail", // hostname
-        //SES: new aws.SES({
-        //    apiVersion: '2010-12-01'
-        //}),
+        service: "Gmail",
+        host: 'smtp.gmail.com',
         auth: {
             user: 'juanignacio8ag@gmail.com',
-            pass: 'Jiog040719'    
+            pass: 'Jiog693082'    
         }
     });
     const host = "http://topexpressqa-env.eba-dcnvmavd.us-east-2.elasticbeanstalk.com"
     
     transporter.sendMail(mailOptions, function(error, info) {
         if(error != null){
-            console.log("Email error: " + error)
+            console.log("Email error: 2" + email + " " + error)
         } else {
             console.log("Email sent: " + email + " " + info.response)
         }

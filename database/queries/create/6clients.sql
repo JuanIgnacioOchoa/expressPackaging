@@ -20,6 +20,7 @@ CREATE TABLE public.clients
     updated_timestamp timestamp with time zone NOT NULL,
     CONSTRAINT clients_pkey PRIMARY KEY (id),
     CONSTRAINT unique_username UNIQUE (username),
+    CONSTRAINT unique_email UNIQUE (email),
     CONSTRAINT fk_status_clients FOREIGN KEY (id_status)
         REFERENCES public.status (id) MATCH SIMPLE
         ON UPDATE NO ACTION

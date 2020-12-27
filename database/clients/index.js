@@ -26,6 +26,10 @@ async function loginClient(username, password){
         const results = await client.query(`SELECT * FROM public."clients" WHERE username = $1 and password = $2`, [username, password])
         if(results.rows.length > 0){
             delete results.rows[0].password
+            const resultAddressClient = await client.query(`SELECT * FROM public."address" WHERE id_client = $1 order by id `, [results.rows[0].id])
+            const resultAddressGlobal = await client.query(`SELECT * FROM public."address" WHERE id < 400 order by id `)
+            results.rows[0].addressClient = resultAddressClient.rows
+            results.rows[0].addressGlobal = resultAddressGlobal.rows
             const resultAddress = await client.query(`SELECT * FROM public."address" WHERE id_client = $1 or id = 1 order by id `, [results.rows[0].id])
             results.rows[0].address = resultAddress.rows
             return status.statusOperation(0, `Procesado Correctamente`, [], {clients: results.rows })
@@ -98,13 +102,11 @@ function sendMail(email, confirmationString, idClient){
     } else {
         //aws.config.update({region:'us-east-2'});
         var transporter = nodemailer.createTransport({
-            host: "gmail", // hostname
-            //SES: new aws.SES({
-            //    apiVersion: '2010-12-01'
-            //}),
+            service: "Gmail",
+            host: 'smtp.gmail.com',
             auth: {
                 user: 'juanignacio8ag@gmail.com',
-                pass: 'Jiog040719'    
+                pass: 'Jiog693082'    
             }
         });
         /*
