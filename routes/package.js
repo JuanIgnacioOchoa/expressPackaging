@@ -72,15 +72,16 @@ router.post('/package/process', async (req, res, next) => {
 });
 
 router.post('/package/process/file', upload.single('file'), async (req, res, next) => {
-  console.log('/package/process/file', req.body.id)
+  console.log('/package/process/file', req.body)
   console.log('/package/process/file', req.file)
   var path = undefined
   if(req.file){
     path = req.file.path
   }
   const id = req.body.id
+  const idAddress = req.body.idAddress
   //console.log('/package/process', req.body.newPackage)
-  const result = await package.insertFile(id, path, req.file)
+  const result = await package.insertFile(id, idAddress, path, req.file)
   res.send(result)
 });
 
