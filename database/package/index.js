@@ -244,17 +244,14 @@ async function processPackage(body){
 
 async function insertFile(id, idAddress, path, file){
     try {
-        const values = [path.path, id]
-        console.log('1 idAddress: ', idAddress)
-        console.log('1 values: ', values)
+        const values = [path, id]
         await client.query(
             `UPDATE public."package"
             SET receipt=$1
             WHERE id=$2`, values
         )
-        console.log('2: ')
         const results = await client.query(`SELECT * FROM public."package" WHERE id = $1`, [id])
-        console.log('3 result: ', results.rows[0])
+        
         const resultSend = await client.query(
             `
                 SELECT p.*, c.name as client_name, c.lastname, c.email, c.phone, s.name as supplier_name, a.address_line_1, a.int_number, a.city, a.state, a.country
@@ -262,9 +259,8 @@ async function insertFile(id, idAddress, path, file){
                     public."package" as p, public."clients" as c, public."suppliers" as s, public."address" as a
                 WHERE p.id = $1 and p.id_client = c.id and p.id_supplier = s.id and a.id = $2
             `, [results.rows[0].id, idAddress])
-        console.log('4 resultSend: ', resultSend)
         sendMailWithImage(resultSend.rows[0], "Top Express: Nuevo Recibo", file)
-        console.log('5')
+        
         return status.statusOperation(0, `Procesado Correctamente`, [], {packages: results.rows})
             
         
