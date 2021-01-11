@@ -1,4 +1,5 @@
 var express = require('express');
+const status = require('../database/status')
 var router = express.Router();
 const client = require('../database/clients/index');
 const package = require('../database/package/index');
@@ -65,10 +66,14 @@ router.post('/client/package', async (req, res, next) => {
 
 
 router.post('/package/process', async (req, res, next) => {
-  console.log('/package/process', req.body)
+  //console.log('/package/process', req.body)
+  console.log('/package/process', req.body.packages)
+  //console.log('/package/process', req.body.packages[0].images)
   //console.log('/package/process', req.body.newPackage)
   const result = await package.processPackage(req.body)
-  res.send(result)
+  console.log("REal result: ", result)
+  const result2 = status.statusOperation(2, `DatabaseOperation Error: `, [], {clients: []})
+  res.send(result2)
 });
 
 router.post('/package/process/file', upload.single('file'), async (req, res, next) => {
@@ -81,7 +86,7 @@ router.post('/package/process/file', upload.single('file'), async (req, res, nex
   const id = req.body.id
   const idAddress = req.body.idAddress
   //console.log('/package/process', req.body.newPackage)
-  const result = await package.insertFile(id, idAddress, path, req.file)
+  const result = await package.insertFile(id, idAd, path, req.file)
   res.send(result)
 });
 

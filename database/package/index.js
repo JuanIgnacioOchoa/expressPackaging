@@ -4,6 +4,7 @@ const moment = require('moment')
 const constants = require('../../constants')
 const supplier = require('../supplier/index')
 const nodemailer = require('nodemailer');
+const fs = require('fs')
 let aws = require('aws-sdk');
 
 
@@ -55,13 +56,24 @@ function sendLocalMail(mailOptions, email){
         }
     })
 }
-function sendMail(package, subject){
+function sendMail(package, subject, images){
     var email = 'topexpressgdl@hotmail.com'
     var subjectTmp = subject
     if(!process.env.host){
         subjectTmp = "PRUEBA: " + subject
         email = 'juanignacio8ag@gmail.com'
     } 
+    const attachmentsImg = []
+    for(var i in images){
+        console.log("base", images[i].name)
+        attachmentsImg.push(
+            {   // encoded string as an attachment
+                filename: 'imagen'+i+'.jpeg',
+                content: images[i].base64,
+                encoding: 'base64'
+            }
+        )
+    }
     const address = package.address_line_1 + ' ' + package.int_number + ' ' + package.city + ' ' + package.state + ' ' + package.country
         var mailOptions = {
             from: email,
@@ -87,7 +99,8 @@ function sendMail(package, subject){
                 currency: ${package.currency}<br/>
                 created_timestamp: ${package.created_timestamp}<br/>
             </p>
-            `
+            `,
+            attachments: attachmentsImg
         }
     if(process.env.host){
         sendMailWithAws(mailOptions, email)
@@ -184,13 +197,10 @@ async function getClientPackages(idClient){
 
 
 async function processPackage(body){
-    console.log("processPackage: ", body)
     const package = body.packages[0]
     try {
         if(package.idSupplier == undefined){
             const newSupplier = await supplier.insertSupplier(package.supplierName)
-            console.log("New Supplier: ", newSupplier)
-            console.log("New Supplier: ", newSupplier.data.suppliers[0].id)
             if(newSupplier.statusOperation.code == 0){
                 package.idSupplier = newSupplier.data.suppliers[0].id
             } else {
@@ -200,15 +210,21 @@ async function processPackage(body){
         if(body.newPackage){
             
             var mysqlTimestamp = moment(Date.now());
-            const {idSupplier, idClient, idAddress, referenceNumber, description, quantity, totalCost, shipCost, packageCost, idStatus, currency} = package
+            const {images, idSupplier, idClient, idAddress, referenceNumber, description, quantity, totalCost, shipCost, packageCost, idStatus, currency} = package
             const values = [idSupplier, idClient, idAddress, referenceNumber, description, quantity, totalCost, shipCost, packageCost, idStatus, currency, mysqlTimestamp, mysqlTimestamp]
-            console.log("Values: ", values)
+            
             const results = await client.query(
                 `INSERT INTO public."package" 
                 (id_supplier, id_client, id_address, reference_number, description, quantity, total_cost, shipping_cost, package_cost, id_status, currency, created_timestamp, updated_timestamp)
                 values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`, values)
             //console.log(results.rows[0])
             //console.log(results)
+            for(var i in images){
+                await client.query(
+                    `INSERT INTO public.imagenes(
+                        id_package, base64, "fileName")
+                        VALUES ($1, $2, $3)`, [results.rows[0].id, images[i].base64, images[i].name])
+            }
             const resultSend = await client.query(
                 `
                     SELECT p.*, c.name as client_name, c.lastname, c.email, c.phone, s.name as supplier_name, a.address_line_1, a.int_number, a.city, a.state, a.country
@@ -216,13 +232,13 @@ async function processPackage(body){
                         public."package" as p, public."clients" as c, public."suppliers" as s, public."address" as a
                     WHERE p.id = $1 and p.id_client = c.id and p.id_supplier = s.id and a.id = $2
                 `, [results.rows[0].id, idAddress])
-            sendMail(resultSend.rows[0], "Top Express: Nuevo Paquete")
+            sendMail(resultSend.rows[0], "Top Express: Nuevo Paquete", body.packages[0].images)
             return status.statusOperation(0, `Procesado Correctamente`, [], { packages: results.rows})
         } else {
             var mysqlTimestamp = moment(Date.now());
             const {idSupplier, idClient, idAddress, referenceNumber, description, quantity, totalCost, shipCost, packageCost, idStatus, currency, idPaymentStatus, id} = body.packages[0]
             const values = [idSupplier, idClient, idAddress, referenceNumber, description, quantity, totalCost, shipCost, packageCost, idStatus, currency, idPaymentStatus, mysqlTimestamp, id]
-            console.log("values 3: ", values)
+            
             const results = await client.query(
                 `UPDATE public."package"
                 SET id_supplier=$1, id_client=$2, id_address=$3, reference_number=$4, description=$5, quantity=$6, total_cost=$7, shipping_cost=$8, 
