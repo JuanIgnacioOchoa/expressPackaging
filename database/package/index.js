@@ -198,7 +198,6 @@ async function getClientPackages(idClient){
 
 async function processPackage(body){
     const package = body.packages[0]
-    
     try {
         if(package.idSupplier == undefined){
             const newSupplier = await supplier.insertSupplier(package.supplierName)
