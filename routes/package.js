@@ -71,9 +71,9 @@ router.post('/package/process', async (req, res, next) => {
   //console.log('/package/process', req.body.packages[0].images)
   //console.log('/package/process', req.body.newPackage)
   const result = await package.processPackage(req.body)
-  console.log("REal result: ", result)
-  const result2 = status.statusOperation(2, `DatabaseOperation Error: `, [], {clients: []})
-  res.send(result2)
+  //console.log("REal result: ", result)
+ // const result2 = status.statusOperation(2, `DatabaseOperation Error: `, [], {clients: []})
+  res.send(result)
 });
 
 router.post('/package/process/file', upload.single('file'), async (req, res, next) => {
